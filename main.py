@@ -1,17 +1,23 @@
-import discord
 import os
-from dotenv import load_dotenv
+import sys
 
-load_dotenv()  # Loads the .env file into environment variables
+commandsPath = os.path.abspath("commands")
+eventsPath = os.path.abspath("events")
+
+sys.path.append(commandsPath)
+sys.path.append(eventsPath)
+
+import discord
+from dotenv import load_dotenv
+from commands import runCommands
+from events import runEvents
+
+load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 bot = discord.Bot()
 
-@bot.event
-async def on_ready():
-    print(f"{bot.user} is ready and online!")
+runEvents()
+runCommands()
 
-@bot.slash_command(name="hello", description="Say hello to the bot")
-async def hello(ctx: discord.ApplicationContext):
-    await ctx.respond("Hey!")
 
 bot.run(BOT_TOKEN)
