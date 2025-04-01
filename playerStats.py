@@ -1,3 +1,5 @@
+playersDic = {}
+
 class Player:
     def __init__(self, id, name):
         self.id = id
@@ -6,3 +8,6 @@ class Player:
         self.health = self.maxHealth
         self.kit = None
         self.weapon = "hand"
+    
+    def reset(self):
+        self.__init__(id=self.id, name=self.name)

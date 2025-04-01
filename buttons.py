@@ -1,14 +1,47 @@
 import discord
+from discord.ui import Button, View
+from gameLogic import gameLogic
 
-class KitsButton(discord.ui.View):
-    @discord.ui.button(label="TANK", row=0, style=discord.ButtonStyle.green, emoji="<:chainmailChestplate:1356637063570653466>")
-    async def first_button_callback(self, button, interaction):
-        await interaction.response.send_message("You chose the tank kit!")
+class KitsButton(View):
 
-    @discord.ui.button(label="HERO", row=0, style=discord.ButtonStyle.red, emoji="<:stoneSword:1356638920271724614>")
-    async def second_button_callback(self, button, interaction):
-        await interaction.response.send_message("You chose the hero kit!")
+    def __init__(self, player):
+        super().__init__(timeout=30)
+        self.player = player
+        
+        kits = [
+            {"label": "TANK", "style": discord.ButtonStyle.green, "emoji": "<:chainmailChestplate:1356637063570653466>"},
+            {"label": "HERO", "style": discord.ButtonStyle.red, "emoji": "<:stoneSword:1356638920271724614>"},
+            {"label": "MEDIC", "style": discord.ButtonStyle.blurple, "emoji": "<:poppy:1356637107384488027>"}
+        ]
+        for kit in kits:
+            btn = Button(**kit, custom_id=f"kit_{kit['label']}")
+            btn.callback = self.handleSelection
+            self.add_item(btn)
 
-    @discord.ui.button(label="MEDIC", row=0, style=discord.ButtonStyle.blurple, emoji="<:poppy:1356637107384488027>")
-    async def third_button_callback(self, button, interaction):
-        await interaction.response.send_message("You chose the medic kit!")
+    async def handleSelection(self, interaction: discord.Interaction):
+        kit_type = interaction.data['custom_id'].split('_')[1]
+        self.player.reset()
+        self.player.kit = kit_type
+
+        if kit_type == "TANK":
+            await self.process_tank(interaction)
+        elif kit_type == "HERO":
+            await self.process_hero(interaction)
+        elif kit_type == "MEDIC":
+            await self.process_medic(interaction)
+        
+        # GAME LOGIC !!!!!!!!!!!!!!
+        await gameLogic(interaction)
+
+    async def process_tank(self, interaction):
+        self.player.maxHealth = 30
+        self.player.health = self.player.maxHealth
+        await interaction.response.send_message("Tank kit activated!", ephemeral=True)
+
+    async def process_hero(self, interaction):
+        self.player.weapon = "stoneSword"
+        await interaction.response.send_message("Hero kit activated!", ephemeral=True)
+
+    async def process_medic(self, interaction):
+        self.player.weapon = "healingBow"
+        await interaction.response.send_message("Medic kit activated!", ephemeral=True)
