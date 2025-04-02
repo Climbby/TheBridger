@@ -1,6 +1,7 @@
 import discord
 from discord.ui import Button, View
 from gameLogic import gameLogic
+from utils import findWeapon
 
 class KitsButton(View):
 
@@ -36,12 +37,12 @@ class KitsButton(View):
     async def process_tank(self, interaction):
         self.player.maxHealth = 30
         self.player.health = self.player.maxHealth
-        await interaction.response.send_message("Tank kit activated!", ephemeral=True)
+        await interaction.response.send_message("Tank kit activated!")
 
     async def process_hero(self, interaction):
-        self.player.weapon = "stoneSword"
-        await interaction.response.send_message("Hero kit activated!", ephemeral=True)
+        self.player.weapon = findWeapon("stoneSword")
+        await interaction.response.send_message("Hero kit activated!")
 
     async def process_medic(self, interaction):
-        self.player.weapon = "healingBow"
-        await interaction.response.send_message("Medic kit activated!", ephemeral=True)
+        self.player.weapon = findWeapon("healingBow")
+        await interaction.response.send_message("Medic kit activated!")

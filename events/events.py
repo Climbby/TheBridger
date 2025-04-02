@@ -8,7 +8,7 @@ def runEvents():
     
     @bot.before_invoke
     async def on_application_command(interaction: discord.Interaction):
-        await interaction.response.defer(ephemeral=True) 
+        await interaction.response.defer() 
         await createUser(interaction)
 
 async def createUser(interaction):

@@ -3,7 +3,7 @@ import discord
 def runCommands():
     from main import bot
     from playerStats import playersDic
-    from buttons import KitsButton
+    from kitSelection import KitsButton
 
     @bot.slash_command(name="mystats", description="Get your health")
     async def mystats(ctx: discord.ApplicationContext):
