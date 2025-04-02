@@ -1,7 +1,7 @@
 import discord
 from discord.ui import Button, View
-from gameLogic import gameLogic
-from utils import findWeapon
+from game.gameLogic import gameLogic
+from utils.utils import findWeapon
 
 class KitsButton(View):
 

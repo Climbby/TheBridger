@@ -2,8 +2,8 @@ import discord
 
 def runCommands():
     from main import bot
-    from playerStats import playersDic
-    from kitSelection import KitsButton
+    from game.playerStats import playersDic
+    from data.kitSelection import KitsButton
 
     @bot.slash_command(name="mystats", description="Get your health")
     async def mystats(ctx: discord.ApplicationContext):

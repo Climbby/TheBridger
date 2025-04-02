@@ -1,4 +1,4 @@
-from playerStats import Player, playersDic
+from game.playerStats import Player, playersDic
 from random import randint
 import discord
 
@@ -20,7 +20,7 @@ async def passTime(interaction):
     await nextEvent(channel)
 
 async def nextEvent(channel):
-    from probabilitiesTable import probabilitiesTable
+    from data.probabilitiesTable import probabilitiesTable
     randomProbability = randint(1, 100)
     cummulativeProbability = 0
 

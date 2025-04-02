@@ -1,4 +1,4 @@
-import gameEvents
+import game.gameEvents as gameEvents
 
 probabilitiesTable = [{gameEvents.minutePass : 20, gameEvents.breakEnemyNexus: 40, gameEvents.breakMyNexus : 40},
                       {},

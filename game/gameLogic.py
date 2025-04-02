@@ -1,5 +1,5 @@
 import discord
-import gameEvents
+import game.gameEvents as gameEvents
 import asyncio
 
 async def gameLogic(interaction: discord.Interaction):

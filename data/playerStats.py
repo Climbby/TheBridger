@@ -1,5 +1,5 @@
-from weaponsList import weaponsList
-from utils import findWeapon
+from data.weaponsList import weaponsList
+from utils.utils import findWeapon
 
 playersDic = {}
 
