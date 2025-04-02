@@ -14,7 +14,10 @@ def runCommands():
         )
         for stat_name, stat_value in vars(playersDic[ctx.author.id]).items():
             if stat_name == "id": continue
-            embed.add_field(name=stat_name, value=stat_value, inline=False)
+            if stat_name == "weapon":
+                embed.add_field(name=stat_name, value=playersDic[ctx.author.id].weapon["type"], inline=False)
+            else:
+                embed.add_field(name=stat_name, value=stat_value, inline=False)
 
         await ctx.respond(embed=embed)
 
@@ -29,4 +32,4 @@ def runCommands():
         embed.add_field(name="HERO <:stoneSword:1356638920271724614>", value="is deadly.", inline=True)
         embed.add_field(name="MEDIC <:poppy:1356637107384488027>", value="is supportive.", inline=True)
 
-        await ctx.respond(embed=embed, view=KitsButton(playersDic[ctx.author.id]))
+        await ctx.respond(content=ctx.author.mention, embed=embed, view=KitsButton(player=playersDic[ctx.author.id], ownerId=ctx.author.id))

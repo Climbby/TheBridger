@@ -1,4 +1,3 @@
-from data.weaponsList import weaponsList
 from utils.utils import findWeapon
 
 playersDic = {}

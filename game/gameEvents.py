@@ -1,50 +1,27 @@
-from data.playerStats import Player, playersDic
-from random import randint
-import discord
+from data.playerStats import playersDic
 
-gameState={
-    "enemyNexusHP" : 3,
-    "myNexusHP" : 3,
-    "minute" : 1,
-    "enemyCount" : 0,
-    "enemy" : Player(0, "guest") 
-}
+class GameEvents:
+    def __init__(self, state, embed):
+        self.state = state
+        self.embed = embed
 
-async def minutePass():
-    gameState["minute"] +=1
-    return f"A minute has passed"
+    async def breakEnemyNexus(self):
+        self.state["enemyNexusHP"] -= 1
+        await self.embed.addField(value=f"Enemy's nexus was broken and now has {self.state["enemyNexusHP"]} HP")
+        
+    async def breakMyNexus(self):
+        self.state["myNexusHP"] -= 1
+        await self.embed.addField(value=f"Our nexus was broken and now has {self.state["myNexusHP"]} HP")
 
-async def passTime(interaction):
-    channel = interaction.channel
-    await minutePass()
-    await nextEvent(channel)
+    async def suddenDeathDamage(self):
+        await self.embed.addField(value=f"**Sudden death is dealing 1 damage to each nexus**") 
+        await self.breakEnemyNexus()
+        await self.breakMyNexus()
 
-async def nextEvent(channel):
-    from data.probabilitiesTable import probabilitiesTable
-    randomProbability = randint(1, 100)
-    cummulativeProbability = 0
+    async def hitEnemy(self, interaction):
+        self.state["enemy"].health -= playersDic[interaction.user.id].weapon["chars"]["damage"]
+        await self.embed.addField(value=f"You have hit the enemy for {playersDic[interaction.user.id].weapon["chars"]["damage"]} damage")
 
-    for event, prob in probabilitiesTable[0].items():
-        cummulativeProbability += prob
-        if randomProbability <= cummulativeProbability:
-            message = await event()
-            await channel.send(message)
-            break
-
-async def breakEnemyNexus():
-    gameState["enemyNexusHP"] -= 1
-    return f"Enemy's nexus was broken and now has {gameState["enemyNexusHP"]} HP"
-    
-async def breakMyNexus():
-    gameState["myNexusHP"] -= 1
-    return f"Our nexus was broken and now has {gameState["myNexusHP"]} HP"
-
-async def suddenDeathDamage():
-    gameState["enemyNexusHP"] -= 1
-    gameState["myNexusHP"] -= 1
-
-async def hitEnemy(interaction: discord.Interaction):
-    gameState["enemy"].health -= playersDic[interaction.user.id].weapon["chars"]["damage"]
-
-async def getHit(interaction: discord.Interaction):
-    playersDic[interaction.user.id].health -= gameState["enemy"].weapon["chars"]["damage"]
+    async def getHit(self, interaction):
+        playersDic[interaction.user.id].health -= self.state["enemy"].weapon["chars"]["damage"]
+        await self.embed.addField(value=f"You have been hit for {self.state["enemy"].weapon["chars"]["damage"]} damage")

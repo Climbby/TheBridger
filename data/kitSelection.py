@@ -1,13 +1,14 @@
 import discord
 from discord.ui import Button, View
-from game.gameLogic import gameLogic
+from game.startGames import startGame
 from utils.utils import findWeapon
 
 class KitsButton(View):
 
-    def __init__(self, player):
+    def __init__(self, player, ownerId):
         super().__init__(timeout=30)
         self.player = player
+        self.ownerId = ownerId
         
         kits = [
             {"label": "TANK", "style": discord.ButtonStyle.green, "emoji": "<:chainmailChestplate:1356637063570653466>"},
@@ -20,29 +21,44 @@ class KitsButton(View):
             self.add_item(btn)
 
     async def handleSelection(self, interaction: discord.Interaction):
+
+        if interaction.user.id != self.ownerId:
+            await interaction.response.send_message("❌ Only the command user can select the kit!", ephemeral=True)
+            return
+
+        await interaction.response.defer(ephemeral=True)
         kit_type = interaction.data['custom_id'].split('_')[1]
+        channel = interaction.channel
+        thread = await channel.create_thread(
+            name=f"{interaction.user.name}'s Game",
+            type=discord.ChannelType.private_thread
+        )
+        await thread.add_user(interaction.user)
         self.player.reset()
         self.player.kit = kit_type
 
         if kit_type == "TANK":
-            await self.process_tank(interaction)
+            await self.process_tank(thread)
         elif kit_type == "HERO":
-            await self.process_hero(interaction)
+            await self.process_hero(thread)
         elif kit_type == "MEDIC":
-            await self.process_medic(interaction)
+            await self.process_medic(thread)
         
-        # GAME LOGIC !!!!!!!!!!!!!!
-        await gameLogic(interaction)
+        for item in self.children:
+            item.disabled = True
+        await interaction.edit_original_response(view=self)
 
-    async def process_tank(self, interaction):
+        await startGame(thread) ############### START GAME!!
+
+    async def process_tank(self, channel):
         self.player.maxHealth = 30
         self.player.health = self.player.maxHealth
-        await interaction.response.send_message("Tank kit activated!")
+        await channel.send("Tank kit activated!")
 
-    async def process_hero(self, interaction):
+    async def process_hero(self, channel):
         self.player.weapon = findWeapon("stoneSword")
-        await interaction.response.send_message("Hero kit activated!")
+        await channel.send("Hero kit activated!")
 
-    async def process_medic(self, interaction):
+    async def process_medic(self, channel):
         self.player.weapon = findWeapon("healingBow")
-        await interaction.response.send_message("Medic kit activated!")
+        await channel.send("Medic kit activated!")
