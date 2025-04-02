@@ -12,6 +12,6 @@ def runEvents():
         await createUser(interaction)
 
 async def createUser(interaction):
-    from game.playerStats import Player, playersDic
+    from data.playerStats import Player, playersDic
     if interaction.user.id not in playersDic:
         playersDic[interaction.user.id] = Player(id=interaction.user.id, name=interaction.user.display_name)    

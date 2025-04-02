@@ -1,4 +1,4 @@
-from game.playerStats import Player, playersDic
+from data.playerStats import Player, playersDic
 from random import randint
 import discord
 
