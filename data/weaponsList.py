@@ -1,5 +1,5 @@
-weaponsList = [
-    {"type" : "hand", "chars" : {"damage" : 1}},
-    {"type" : "healingBow", "chars" : {"damage" : 3}},
-    {"type" : "stoneSword", "chars" : {"damage" : 5}}
-]
+weaponsList = {
+    "hand" : {"damage" : 1},
+    "healingBow" : {"damage" : 3},
+    "stoneSword" : {"damage" : 5}
+}

@@ -3,12 +3,15 @@ import discord
 class GameEmbed:
     def __init__(self):
         self.embed = discord.Embed(
-                        title = "TheBridge Simulator Game",
-                        color = discord.Colour.blurple()
-                     )
+            title = "TheBridge Simulator Game",
+            color = discord.Colour.blurple()
+        )
         
     async def resetEmbed(self):
-        self.__init__()
+        self.embed = discord.Embed(
+            title="TheBridge Simulator Game",
+            color=discord.Colour.blurple()
+        )
         
     async def setDescription(self, description):
         self.embed.description = description

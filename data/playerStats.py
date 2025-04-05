@@ -1,4 +1,4 @@
-from utils.utils import findWeapon
+from data.weaponsList import weaponsList
 
 playersDic = {}
 
@@ -9,7 +9,7 @@ class Player:
         self.maxHealth = 20
         self.health = self.maxHealth
         self.kit = None
-        self.weapon = findWeapon("hand")
+        self.weapon = weaponsList["hand"]
     
     def reset(self):
         self.__init__(id=self.id, name=self.name)

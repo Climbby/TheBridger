@@ -1,7 +1,7 @@
 import discord
 from discord.ui import Button, View
 from game.startGames import startGame
-from utils.utils import findWeapon
+from data.weaponsList import weaponsList
 
 class KitsButton(View):
 
@@ -56,9 +56,9 @@ class KitsButton(View):
         await channel.send("Tank kit activated!")
 
     async def process_hero(self, channel):
-        self.player.weapon = findWeapon("stoneSword")
+        self.player.weapon = weaponsList["stoneSword"]
         await channel.send("Hero kit activated!")
 
     async def process_medic(self, channel):
-        self.player.weapon = findWeapon("healingBow")
+        self.player.weapon = weaponsList["healingBow"]
         await channel.send("Medic kit activated!")
