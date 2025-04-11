@@ -1,12 +1,11 @@
-import discord
 import game.gameLogic as gameLogic
 import asyncio
 
 activeGames = {}
 
-async def startGame(thread):
+async def startGame(thread, user):
 
-    activeGames[thread.id] = gameLogic.TheBridgeGame(thread)
+    activeGames[thread.id] = gameLogic.TheBridgeGame(thread, user)
     game = activeGames.get(thread.id)
 
     while (game.state["myNexusHP"] > 0 and game.state["enemyNexusHP"] > 0):

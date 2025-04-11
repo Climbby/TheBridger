@@ -1,5 +1,6 @@
+import discord
+
 def runEvents():
-    import discord
     from main import bot
     
     @bot.event
@@ -12,6 +13,6 @@ def runEvents():
         await createUser(interaction)
 
 async def createUser(interaction):
-    from data.playerStats import Player, playersDic
+    from game.data.playerStats import Player, playersDic
     if interaction.user.id not in playersDic:
         playersDic[interaction.user.id] = Player(id=interaction.user.id, name=interaction.user.display_name)    

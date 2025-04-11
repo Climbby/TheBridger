@@ -1,4 +1,4 @@
-from data.weaponsList import weaponsList
+from game.data.weaponsList import weaponsList
 
 playersDic = {}
 
