@@ -1,4 +1,5 @@
-from game.data.playerStats import playersDic
+from game.data.playerStats import playersDic, Player
+from game.data.weaponsList import weaponsList
 
 class GameEvents():
     def __init__(self, eventsEmbed, state, user):
@@ -23,10 +24,33 @@ class GameEvents():
         await self.breakEnemyNexus()
         await self.breakMyNexus()
 
-    async def hitEnemy(self):
-        self.state["enemy"].health -= playersDic[self.user.id].weapon["damage"]
-        await self.eventsEmbed.addField(value=f"You have hit the enemy for {playersDic[self.user.id].weapon["damage"]} damage")
+    async def die(self):
+        self.state["place"] = "goOurBase"
+        self.state["spot"] = "goOurBase"
+        playersDic[self.user.id].health = playersDic[self.user.id].maxHealth
+        playersDic[self.user.id].resources["base"] = 0
+        playersDic[self.user.id].resources["mid"] = 0
+        if self.state["minute"] >= 10:
+            await self.suddenDeathDamage()
 
-    async def getHit(self):
-        playersDic[self.user.id].health -= self.state["enemy"].weapon["damage"]
-        await self.eventsEmbed.addField(value=f"You have been hit for {self.state["enemy"].weapon["damage"]} damage")
+    async def fight(self):
+        enemy = Player(0, "guest")
+
+        while (enemy.health > 0 and playersDic[self.user.id].health > 0):
+            enemy.health -= playersDic[self.user.id].weapon["damage"]  
+            playersDic[self.user.id].health -= enemy.weapon["damage"]          
+        
+        if enemy.health <= 0:
+            await self.eventsEmbed.addField(value="You have defeated the enemy")
+        else:
+            self.state["minute"] += 1
+            await self.eventsEmbed.addField(value="You have been defeated and have taken a minute to respawn")
+            await self.die()
+        
+    async def doBasicGear(self):
+        playersDic[self.user.id].weapon = weaponsList["stoneSword"]
+        playersDic[self.user.id].maxHealth = 30
+
+    async def doAdvancedGear(self):
+        playersDic[self.user.id].weapon = weaponsList["diamondSword"]
+        playersDic[self.user.id].maxHealth = 50

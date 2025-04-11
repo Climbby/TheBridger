@@ -1,13 +1,16 @@
 import discord
 from discord.ui import Button, View
-from game.data.probabilitiesTable import Probabilities
+from game.data.playerStats import playersDic
 import asyncio
 
 class OptionsSelection():
-    def __init__(self, optionsEmbed, state, doNextEvent, channel):
+    def __init__(self, optionsEmbed, eventsEmbed, state, doNextEvent, events, user, channel):
         self.optionsEmbed = optionsEmbed
+        self.eventsEmbed = eventsEmbed
         self.state = state
         self.doNextEvent = doNextEvent
+        self.events = events
+        self.user = user
         self.channel = channel
 
     async def sendOptions(self):
@@ -17,8 +20,14 @@ class OptionsSelection():
             "goEnemyBase": ["goMid", "breakNexus", "fight", "stealResources"]
         }
 
-        if self.state["minute"] >= 5:
+        if self.state["minute"] >= 3:
             optionsDic["goOurBase"].append("goMid")
+
+        if playersDic[self.user.id].resources["base"] > 0:
+            optionsDic["goOurBase"].append("doBasicGear")
+
+        if playersDic[self.user.id].resources["mid"] > 0:
+            optionsDic["goOurBase"].append("doAdvancedGear")
 
         optionsDisplayName = {
             "goOurBase_place": "your Base",
@@ -28,6 +37,8 @@ class OptionsSelection():
             "goMid": "To the Middle!",
             "goEnemyBase": "Rush Enemy's Base!",
             "getResourcesBase": "Get Resources",
+            "doBasicGear" : "Craft basic Gear",
+            "doAdvancedGear" : "Craft ADVANCED Gear",
             "defend": "Lets Defend",
             "fight": "Fight Them!",
             "getResourcesMid": "Get Resources",
@@ -38,20 +49,22 @@ class OptionsSelection():
         await self.optionsEmbed.setDescription(description=f"Choose your option, you're in {optionsDisplayName[f"{self.state["place"]}_place"]}")
         for i in range(len(listOfOptions)):
             await self.optionsEmbed.addField(name=f"**Option {i+1}:**", value=optionsDisplayName[listOfOptions[i]])
-        view = OptionsButtons(self.state, self.channel, self.doNextEvent, optionsDisplayName, listOfOptions)
+        view = OptionsButtons(self.state, self.channel, self.eventsEmbed, self.doNextEvent, self.events, optionsDisplayName, listOfOptions)
         await self.channel.send(embed=self.optionsEmbed.embed, view=view)
         await view.done.wait()
 
 
 class OptionsButtons(View):
         
-    def __init__(self, state, channel, doNextEvent, optionsDisplayName, listOfOptions):
+    def __init__(self, state, channel, eventsEmbed, doNextEvent, events, optionsDisplayName, listOfOptions):
         super().__init__(timeout=120)
         self.state = state
         self.channel = channel
+        self.eventsEmbed = eventsEmbed
+        self.doNextEvent = doNextEvent
+        self.events = events
         self.optionsDisplayName = optionsDisplayName
         self.listOfOptions = listOfOptions
-        self.doNextEvent = doNextEvent
         self.done = asyncio.Event()
         for option in listOfOptions:
             btn = Button(label=optionsDisplayName[option], style=discord.ButtonStyle.blurple, custom_id=option)
@@ -86,32 +99,34 @@ class OptionsButtons(View):
         
     async def doEvent(self, optionChosen):
 
+        # await getattr(self.events, optionChosen)()
+
         match optionChosen:
-            case "goOurBase": 
-                print("B")
+            case "doBasicGear": 
+                await getattr(self.events, optionChosen)()
 
-            case "goMid": 
-                print("B")
+            case "doAdvancedGear": 
+                await getattr(self.events, optionChosen)()
 
-            case "goEnemyBase": 
-                print("B")
+        #     case "goEnemyBase": 
+        #         print("B")
 
-            case "getResourcesBase": 
-                print("B")
+        #     case "getResourcesBase": 
+        #         print("B")
 
-            case "defend": 
-                print("B")
+        #     case "defend": 
+        #         print("B")
 
-            case "fight": 
-                print("B")
+        #     case "fight": 
+        #         print("B")
 
-            case "getResourcesMid": 
-                print("B")
+        #     case "getResourcesMid": 
+        #         print("B")
 
-            case "breakNexus": 
-                print("B")
+        #     case "breakNexus": 
+        #         print("B")
 
-            case "stealResources": 
-                print("B")
+        #     case "stealResources": 
+        #         print("B")
 
-        await self.channel.send(f"Option Chosen was: {optionChosen}")
+        await self.eventsEmbed.addField(name="Action Taken:", value=f"Option Chosen was: {optionChosen}")

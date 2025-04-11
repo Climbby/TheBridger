@@ -15,7 +15,7 @@ def runCommands():
         for stat_name, stat_value in vars(playersDic[ctx.author.id]).items():
             if stat_name == "id": continue
             if stat_name == "weapon":
-                embed.add_field(name=stat_name, value=playersDic[ctx.author.id].weapon["type"], inline=False)
+                embed.add_field(name=stat_name, value=playersDic[ctx.author.id].weapon["name"], inline=False)
             else:
                 embed.add_field(name=stat_name, value=stat_value, inline=False)
 
