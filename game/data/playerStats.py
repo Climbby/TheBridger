@@ -1,5 +1,5 @@
 from typing import Dict
-from game.data.weaponsList import weaponsList
+from game.data.weapons import WEAPONS
 
 players = {}
 DEFAULT_WEAPON = "hand"
@@ -11,7 +11,7 @@ class Player:
         self.name = name
         self.maxHealth = 20
         self.health = self.maxHealth
-        self.weapon = weaponsList[DEFAULT_WEAPON]
+        self.weapon = WEAPONS[DEFAULT_WEAPON]
         self.kit = None
         self.resources = {"base" : 0, "mid" : 0}
     

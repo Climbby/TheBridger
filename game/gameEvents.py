@@ -1,5 +1,5 @@
 from game.data.playerStats import players, Player
-from game.data.weaponsList import weaponsList
+from game.data.weapons import WEAPONS
 
 class GameEvents():
     def __init__(self, eventsEmbed, state, user):
@@ -48,9 +48,9 @@ class GameEvents():
             await self.die()
         
     async def doBasicGear(self):
-        players[self.user.id].weapon = weaponsList["stoneSword"]
+        players[self.user.id].weapon = WEAPONS["stoneSword"]
         players[self.user.id].maxHealth = 30
 
     async def doAdvancedGear(self):
-        players[self.user.id].weapon = weaponsList["diamondSword"]
+        players[self.user.id].weapon = WEAPONS["diamondSword"]
         players[self.user.id].maxHealth = 50

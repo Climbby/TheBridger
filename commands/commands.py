@@ -1,5 +1,6 @@
 import discord
 from game.data.playerStats import players
+from game.data.kits import KITS
 from game.selections.kitSelection import KitsButton
 
 def runCommands():
@@ -23,12 +24,11 @@ def runCommands():
             description="You've just started a simulation of a TheBridge game, choose a kit to start.",
             color=discord.Colour.blurple(),
         )
-        roles = {
-            "TANK <:chainmailChestplate:1356637063570653466>" : "is tanky",
-            "HERO <:stoneSword:1356638920271724614>" : "is deadly.",
-            "MEDIC <:poppy:1356637107384488027>" : "is supportive."
-        }
-        for name, desc in roles.items():
-            embed.add_field(name=name, value=desc, inline=True)
+        for kit in KITS:
+            embed.add_field(
+                name=f"{kit["label"]} {kit["emoji"]}", 
+                value=kit["description"], 
+                inline=True
+            )
 
-        await ctx.respond(content=ctx.author.mention, embed=embed, view=KitsButton(player=players[ctx.author.id], ownerId=ctx.author.id))
+        await ctx.respond(content=ctx.author.mention, embed=embed, view=KitsButton(player=players[ctx.author.id], owner_id=ctx.author.id))

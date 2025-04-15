@@ -1,12 +1,12 @@
 import game.gameLogic as gameLogic
 import asyncio
 
-activeGames = {}
+active_games = {}
 
 async def startGame(thread, user):
 
-    activeGames[thread.id] = gameLogic.TheBridgeGame(thread, user)
-    game = activeGames.get(thread.id)
+    active_games[thread.id] = gameLogic.TheBridgeGame(thread, user)
+    game = active_games.get(thread.id)
 
     while (game.state["myNexusHP"] > 0 and game.state["enemyNexusHP"] > 0):
         await asyncio.sleep(5)

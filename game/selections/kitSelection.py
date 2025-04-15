@@ -1,27 +1,27 @@
 import discord
-from discord.ui import Button, View
-from game.data.weaponsList import weaponsList
+from game.data.weapons import WEAPONS
+from game.data.kits import KITS
 from game.startGames import startGame
 
-class KitsButton(View):
+class KitsButton(discord.ui.View):
 
-    def __init__(self, player, ownerId):
+    def __init__(self, player, owner_id):
         super().__init__(timeout=120)
         self.player = player
-        self.ownerId = ownerId
+        self.owner_id = owner_id
         
-        kits = [
-            {"label": "TANK", "style": discord.ButtonStyle.green, "emoji": "<:chainmailChestplate:1356637063570653466>"},
-            {"label": "HERO", "style": discord.ButtonStyle.red, "emoji": "<:stoneSword:1356638920271724614>"},
-            {"label": "MEDIC", "style": discord.ButtonStyle.blurple, "emoji": "<:poppy:1356637107384488027>"}
-        ]
-        for kit in kits:
-            btn = Button(**kit, custom_id=kit["label"])
+        for kit in KITS:
+            btn = discord.ui.Button(
+                label=kit["label"],
+                style=kit["style"],
+                emoji=kit["emoji"],
+                custom_id=kit["label"]
+            )
             btn.callback = self.handleSelection
             self.add_item(btn)
 
     async def handleSelection(self, interaction: discord.Interaction):
-        if interaction.user.id != self.ownerId:
+        if interaction.user.id != self.owner_id:
             await interaction.response.send_message("❌ Only the command user can select the kit!", ephemeral=True)
             return
 
@@ -56,9 +56,9 @@ class KitsButton(View):
         await channel.send("Tank kit activated!")
 
     async def process_hero(self, channel):
-        self.player.weapon = weaponsList["stoneSword"]
+        self.player.weapon = WEAPONS["stoneSword"]
         await channel.send("Hero kit activated!")
 
     async def process_medic(self, channel):
-        self.player.weapon = weaponsList["healingBow"]
+        self.player.weapon = WEAPONS["healingBow"]
         await channel.send("Medic kit activated!")
