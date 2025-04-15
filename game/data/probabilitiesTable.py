@@ -1,4 +1,4 @@
-from game.data.playerStats import playersDic
+from game.data.playerStats import players
 
 class Probabilities():
 
@@ -33,16 +33,16 @@ class Probabilities():
 
         match self.state["spot"]:
             case "getResourcesBase":
-                playersDic[self.user.id].resources["base"] += 1
+                players[self.user.id].resources["base"] += 1
             
             case "getResourcesMid":
-                playersDic[self.user.id].resources["mid"] += 1
+                players[self.user.id].resources["mid"] += 1
 
             case "doBasicGear":
-                playersDic[self.user.id].resources["base"] -= 1
+                players[self.user.id].resources["base"] -= 1
             
             case "doAdvancedGear":
-                playersDic[self.user.id].resources["mid"] -= 1
+                players[self.user.id].resources["mid"] -= 1
 
             case "fight":
                 await self.events.fight()

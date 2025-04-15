@@ -1,5 +1,5 @@
 from game.data.playerStats import Player
-from game.data.playerStats import playersDic
+from game.data.playerStats import players
 from game.data.probabilitiesTable import Probabilities
 from game.selections.optionsSelection import OptionsSelection 
 from game.gameEvents import GameEvents
@@ -60,10 +60,10 @@ class TheBridgeGame():
 
 
     async def regenHealth(self, rHealth):
-        if rHealth + playersDic[self.user.id].health > playersDic[self.user.id].maxHealth:
-            playersDic[self.user.id].health = playersDic[self.user.id].maxHealth
+        if rHealth + players[self.user.id].health > players[self.user.id].maxHealth:
+            players[self.user.id].health = players[self.user.id].maxHealth
         else: 
-            playersDic[self.user.id].health += rHealth
+            players[self.user.id].health += rHealth
 
     async def gameOver(self):
         await self.channel.send("# Game ENDED!")

@@ -1,4 +1,4 @@
-from game.data.playerStats import playersDic, Player
+from game.data.playerStats import players, Player
 from game.data.weaponsList import weaponsList
 
 class GameEvents():
@@ -27,18 +27,18 @@ class GameEvents():
     async def die(self):
         self.state["place"] = "goOurBase"
         self.state["spot"] = "goOurBase"
-        playersDic[self.user.id].health = playersDic[self.user.id].maxHealth
-        playersDic[self.user.id].resources["base"] = 0
-        playersDic[self.user.id].resources["mid"] = 0
+        players[self.user.id].health = players[self.user.id].maxHealth
+        players[self.user.id].resources["base"] = 0
+        players[self.user.id].resources["mid"] = 0
         if self.state["minute"] >= 10:
             await self.suddenDeathDamage()
 
     async def fight(self):
         enemy = Player(0, "guest")
 
-        while (enemy.health > 0 and playersDic[self.user.id].health > 0):
-            enemy.health -= playersDic[self.user.id].weapon["damage"]  
-            playersDic[self.user.id].health -= enemy.weapon["damage"]          
+        while (enemy.health > 0 and players[self.user.id].health > 0):
+            enemy.health -= players[self.user.id].weapon["damage"]  
+            players[self.user.id].health -= enemy.weapon["damage"]          
         
         if enemy.health <= 0:
             await self.eventsEmbed.addField(value="You have defeated the enemy")
@@ -48,9 +48,9 @@ class GameEvents():
             await self.die()
         
     async def doBasicGear(self):
-        playersDic[self.user.id].weapon = weaponsList["stoneSword"]
-        playersDic[self.user.id].maxHealth = 30
+        players[self.user.id].weapon = weaponsList["stoneSword"]
+        players[self.user.id].maxHealth = 30
 
     async def doAdvancedGear(self):
-        playersDic[self.user.id].weapon = weaponsList["diamondSword"]
-        playersDic[self.user.id].maxHealth = 50
+        players[self.user.id].weapon = weaponsList["diamondSword"]
+        players[self.user.id].maxHealth = 50

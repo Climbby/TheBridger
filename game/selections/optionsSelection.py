@@ -1,6 +1,6 @@
 import discord
 from discord.ui import Button, View
-from game.data.playerStats import playersDic
+from game.data.playerStats import players
 import asyncio
 
 class OptionsSelection():
@@ -23,10 +23,10 @@ class OptionsSelection():
         if self.state["minute"] >= 3:
             optionsDic["goOurBase"].append("goMid")
 
-        if playersDic[self.user.id].resources["base"] > 0:
+        if players[self.user.id].resources["base"] > 0:
             optionsDic["goOurBase"].append("doBasicGear")
 
-        if playersDic[self.user.id].resources["mid"] > 0:
+        if players[self.user.id].resources["mid"] > 0:
             optionsDic["goOurBase"].append("doAdvancedGear")
 
         optionsDisplayName = {
