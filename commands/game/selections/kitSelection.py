@@ -1,14 +1,14 @@
 import discord
+import asyncio
 from commands.game.data.weapons import WEAPONS
 from commands.game.data.kits import KITS
 from commands.game.startGames import startGame
 
 class KitsButton(discord.ui.View):
-
-    def __init__(self, player, owner_id):
+    def __init__(self, player, owner):
         super().__init__(timeout=120)
         self.player = player
-        self.owner_id = owner_id
+        self.owner = owner
         
         for kit in KITS:
             btn = discord.ui.Button(
@@ -21,7 +21,8 @@ class KitsButton(discord.ui.View):
             self.add_item(btn)
 
     async def handleSelection(self, interaction: discord.Interaction):
-        if interaction.user.id != self.owner_id:
+        from commands.commands import create_stats_embed
+        if interaction.user.id != self.owner.id:
             await interaction.response.send_message("❌ Only the command user can select the kit!", ephemeral=True)
             return
 
@@ -29,36 +30,43 @@ class KitsButton(discord.ui.View):
         kit_type = interaction.custom_id
         channel = interaction.channel
         user = interaction.user
+
+        #create a private thread for the game
         thread = await channel.create_thread(
-            name=f"{interaction.user.name}'s Game",
+            name=f"{interaction.user.display_name}'s Game",
             type=discord.ChannelType.private_thread
         )
         await thread.add_user(user)
+
+        # reset player and apply kit
         self.player.reset()
         self.player.kit = kit_type
 
-        if kit_type == "TANK":
-            await self.process_tank(thread)
-        elif kit_type == "HERO":
-            await self.process_hero(thread)
-        elif kit_type == "MEDIC":
-            await self.process_medic(thread)
+        # Process the selected kit dynamically
+        process_method = getattr(self, f"process_{kit_type.lower()}")
+        process_method()
+        for kit in KITS:
+            if kit["label"] == kit_type:
+                stats_embed = create_stats_embed(self.player, self.owner.display_name, color=kit["color"])
+                await thread.send(content=f"# __{kit["label"]}__ {kit["emoji"]} Activated!", embed=stats_embed)
+                await asyncio.sleep(2)
+                await thread.send("_(you can do /mystats during the game)_")
         
+        # Disable all buttons after selection
         for item in self.children:
             item.disabled = True
         await interaction.edit_original_response(view=self)
 
-        await startGame(thread, user) ############### START GAME!!
+        # Start the game
+        await startGame(thread, user)
 
-    async def process_tank(self, channel):
+    def process_tank(self):
         self.player.maxHealth = 30
         self.player.health = self.player.maxHealth
-        await channel.send("Tank kit activated!")
 
-    async def process_hero(self, channel):
+    def process_hero(self):
         self.player.weapon = WEAPONS["stoneSword"]
-        await channel.send("Hero kit activated!")
 
-    async def process_medic(self, channel):
+    def process_medic(self):
         self.player.weapon = WEAPONS["healingBow"]
-        await channel.send("Medic kit activated!")
+        

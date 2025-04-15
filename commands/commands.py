@@ -8,13 +8,8 @@ def runCommands():
 
     @bot.slash_command(name="mystats", description="Get your health")
     async def mystats(ctx: discord.ApplicationContext):
-        embed = discord.Embed(
-            title=f"{ctx.author.display_name}'s stats",
-            color=discord.Colour.blurple(),
-        )
         player = players[ctx.author.id]
-        player.display_stats(embed)
-
+        embed = create_stats_embed(player, ctx.author.display_name)
         await ctx.respond(embed=embed)
 
     @bot.slash_command(name="startgame", description="Start the TheBridge game")
@@ -31,4 +26,12 @@ def runCommands():
                 inline=True
             )
 
-        await ctx.respond(content=ctx.author.mention, embed=embed, view=KitsButton(player=players[ctx.author.id], owner_id=ctx.author.id))
+        await ctx.respond(content=ctx.author.mention, embed=embed, view=KitsButton(player=players[ctx.author.id], owner=ctx.author))
+
+def create_stats_embed(player, display_name, color=discord.Colour.blurple()):
+        embed = discord.Embed(
+            title=f"{display_name}'s stats",
+            color=color,
+        )
+        player.display_stats(embed)
+        return embed
