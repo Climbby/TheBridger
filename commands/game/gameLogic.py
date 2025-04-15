@@ -1,9 +1,9 @@
-from game.data.playerStats import Player
-from game.data.playerStats import players
-from game.data.probabilitiesTable import Probabilities
-from game.selections.optionsSelection import OptionsSelection 
-from game.gameEvents import GameEvents
-from game.gameEmbed import GameEmbed
+from commands.game.data.playerStats import Player
+from commands.game.data.playerStats import players
+from commands.game.data.probabilitiesTable import Probabilities
+from commands.game.selections.optionsSelection import OptionsSelection 
+from commands.game.gameEvents import GameEvents
+from commands.game.gameEmbed import GameEmbed
 from random import randint
 
 class TheBridgeGame():

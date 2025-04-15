@@ -1,4 +1,4 @@
-from game.data.playerStats import players
+from commands.game.data.playerStats import players
 
 class Probabilities():
 

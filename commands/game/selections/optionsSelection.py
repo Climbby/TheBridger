@@ -1,6 +1,6 @@
 import discord
 from discord.ui import Button, View
-from game.data.playerStats import players
+from commands.game.data.playerStats import players
 import asyncio
 
 class OptionsSelection():

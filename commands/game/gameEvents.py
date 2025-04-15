@@ -1,5 +1,5 @@
-from game.data.playerStats import players, Player
-from game.data.weapons import WEAPONS
+from commands.game.data.playerStats import players, Player
+from commands.game.data.weapons import WEAPONS
 
 class GameEvents():
     def __init__(self, eventsEmbed, state, user):

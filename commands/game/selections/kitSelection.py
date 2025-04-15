@@ -1,7 +1,7 @@
 import discord
-from game.data.weapons import WEAPONS
-from game.data.kits import KITS
-from game.startGames import startGame
+from commands.game.data.weapons import WEAPONS
+from commands.game.data.kits import KITS
+from commands.game.startGames import startGame
 
 class KitsButton(discord.ui.View):
 

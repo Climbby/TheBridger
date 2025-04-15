@@ -1,7 +1,7 @@
 import discord
-from game.data.playerStats import players
-from game.data.kits import KITS
-from game.selections.kitSelection import KitsButton
+from commands.game.data.playerStats import players
+from commands.game.data.kits import KITS
+from commands.game.selections.kitSelection import KitsButton
 
 def runCommands():
     from main import bot

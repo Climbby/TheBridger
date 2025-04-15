@@ -1,5 +1,5 @@
 from typing import Dict
-from game.data.weapons import WEAPONS
+from commands.game.data.weapons import WEAPONS
 
 players = {}
 DEFAULT_WEAPON = "hand"

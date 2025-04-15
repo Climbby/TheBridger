@@ -1,4 +1,4 @@
-import game.gameLogic as gameLogic
+import commands.game.gameLogic as gameLogic
 import asyncio
 
 active_games = {}
