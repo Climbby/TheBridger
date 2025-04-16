@@ -5,7 +5,7 @@ active_games = {}
 GAME_TICK_INTERVAL = 2
 SELF_DESTRUCT_DELAY = 60
 
-async def startGame(thread, user):
+async def startGame(thread, channel, user):
     """Start and manage a game session in a thread."""
     try:
         game = gameLogic.TheBridgeGame(thread, user)
@@ -18,10 +18,14 @@ async def startGame(thread, user):
         
     finally:
         active_games.pop(thread.id)
-        await thread.delete()
+        try:
+            await thread.delete()
+        except Exception as e:
+            await channel.send(content="Game was deleted because you were afk.", ephemeral=True)
 
 async def run_game_loop(game: gameLogic.TheBridgeGame):
     """Run the game loop until one nexus is destroyed."""
+    
     while game.state.my_nexus_hp > 0 and game.state.enemy_nexus_hp > 0:
         await asyncio.sleep(GAME_TICK_INTERVAL)
         await game.passTime()

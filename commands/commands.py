@@ -19,13 +19,7 @@ def runCommands():
             description="You've just started a simulation of a TheBridge game, choose a kit to start.",
             color=0xDEE0FC,
         )
-        for kit in KITS:
-            embed.add_field(
-                name=f"{kit["label"]} {kit["emoji"]}", 
-                value=kit["description"], 
-                inline=True
-            )
-
+        create_kits(embed)
         await ctx.respond(content=ctx.author.mention, embed=embed, view=KitsButton(player=players[ctx.author.id], owner=ctx.author))
 
 def create_stats_embed(player, display_name, color=discord.Colour.blurple()):
@@ -35,3 +29,11 @@ def create_stats_embed(player, display_name, color=discord.Colour.blurple()):
         )
         player.display_stats(embed)
         return embed
+
+def create_kits(embed):
+    for kit in KITS:
+        embed.add_field(
+            name=f"{kit["label"]} {kit["emoji"]}", 
+            value=kit["description"], 
+            inline=True
+        )

@@ -43,13 +43,20 @@ class OptionsSelection():
         await view.done.wait()
 
     def _check_available_options(self):
-        if self.state.minute >= 3 and "goMid" not in self.options_available["goOurBase"]:
+
+        #avoids duplicates
+        for option in ["goMid", "doBasicGear", "doAdvancedGear"]:
+            if option in self.options_available["goOurBase"]:
+                continue
+
+        #checks specific cases
+        if self.state.minute >= 3:
             self.options_available["goOurBase"].append("goMid")
 
-        if players[self.user.id].resources["base"] > 0 and "doBasicGear" not in self.options_available["goOurBase"]:
+        if players[self.user.id].resources["base"] > 0:
             self.options_available["goOurBase"].append("doBasicGear")
 
-        if players[self.user.id].resources["mid"] > 0 and "doAdvancedGear" not in self.options_available["goOurBase"]:
+        if players[self.user.id].resources["mid"] > 0:
             self.options_available["goOurBase"].append("doAdvancedGear")
 
         self.list_of_options = [option for option in self.options_available[self.state.place]]
@@ -67,7 +74,6 @@ class OptionsSelection():
 
 
 class OptionsButtons(discord.ui.View):
-        
     def __init__(self, state, channel, eventsEmbed, doNextEvent, events, listOfOptions):
         super().__init__(timeout=300)
         self.state = state
@@ -80,24 +86,13 @@ class OptionsButtons(discord.ui.View):
         self.done = asyncio.Event()
         self._setup_buttons()
 
-    async def on_timeout(self):
-        await self.channel.delete()
-
     def _setup_buttons(self):
         """Creates the buttons for the options view."""
 
         for option in self.list_of_options:
             btn = discord.ui.Button(label=OPTIONS_DISPLAY_NAME[option], style=discord.ButtonStyle.blurple, custom_id=option)
-            btn.callback = self.handleSelection
+            btn.callback = self.handle_selection
             self.add_item(btn)
-
-    async def handleSelection(self, interaction):
-        self.interaction = interaction
-        await interaction.response.defer(ephemeral=True)
-        await self._check_option_place()
-        await self.doNextEvent()
-        await self._disable_buttons()
-        self.done.set()
 
     async def _check_option_place(self):
 
@@ -107,7 +102,7 @@ class OptionsButtons(discord.ui.View):
 
         else:
             self.state.spot = self.interaction.data["custom_id"]
-            await self.doEvent(self.interaction.data["custom_id"]) 
+            await self.do_event(self.interaction.data["custom_id"]) 
 
     async def _disable_buttons(self):
 
@@ -115,11 +110,22 @@ class OptionsButtons(discord.ui.View):
             item.disabled = True
 
         await self.interaction.edit_original_response(view=self)
-        
-    async def doEvent(self, optionChosen):
+
+    async def handle_selection(self, interaction):
+        self.interaction = interaction
+        await interaction.response.defer(ephemeral=True)
+        await self._check_option_place()
+        await self.doNextEvent()
+        await self._disable_buttons()
+        self.done.set()
+
+    async def do_event(self, chosen_option):
         """Does specific event cases."""
 
-        if optionChosen == "doBasicGear" or optionChosen == "doAdvancedGear": 
-            await getattr(self.events, optionChosen)
+        if chosen_option == "doBasicGear" or chosen_option == "doAdvancedGear": 
+            await getattr(self.events, chosen_option)
 
-        await self.eventsEmbed.addField(name="Action Taken:", value=f"Option Chosen was: {optionChosen}")
+        await self.eventsEmbed.addField(name="Action Taken:", value=f"Option Chosen was: {chosen_option}")
+
+    async def on_timeout(self):
+        await self.channel.delete()
