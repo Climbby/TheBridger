@@ -9,7 +9,7 @@ def runCommands():
     @bot.slash_command(name="mystats", description="Get your health")
     async def mystats(ctx: discord.ApplicationContext):
         player = players[ctx.author.id]
-        embed = create_stats_embed(player, ctx.author.display_name)
+        embed = create_stats_embed(player, ctx.author.display_name, color=0xDEE0FC)
         await ctx.respond(embed=embed)
 
     @bot.slash_command(name="startgame", description="Start the TheBridge game")
@@ -17,7 +17,7 @@ def runCommands():
         embed = discord.Embed(
             title="TheBridge Simulation",
             description="You've just started a simulation of a TheBridge game, choose a kit to start.",
-            color=discord.Colour.blurple(),
+            color=0xDEE0FC,
         )
         for kit in KITS:
             embed.add_field(

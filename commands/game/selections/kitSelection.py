@@ -21,8 +21,10 @@ class KitsButton(discord.ui.View):
             self.add_item(btn)
         
     async def on_timeout(self):
+
         for item in self.children:
             item.disabled = True
+            
         await self.message.edit(view=self)
         await asyncio.sleep(3600)
         await self.message.edit(view=None)
@@ -68,8 +70,8 @@ class KitsButton(discord.ui.View):
         await startGame(thread, user)
 
     def process_tank(self):
-        self.player.maxHealth = 30
-        self.player.health = self.player.maxHealth
+        self.player.max_health = 30
+        self.player.health = self.player.max_health
 
     def process_hero(self):
         self.player.weapon = WEAPONS["stoneSword"]

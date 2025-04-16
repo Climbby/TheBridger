@@ -8,6 +8,7 @@ class GameEmbed:
         )
         
     async def resetEmbed(self):
+        """Reset the embed (eg. at the beggining of each roud)"""
         self.embed = discord.Embed(
             title= "TheBridge Simulator Game",
             color= 0xDEE0FC

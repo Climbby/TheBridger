@@ -11,12 +11,12 @@ class GameEvents():
         pass 
 
     async def breakEnemyNexus(self):
-        self.state["enemyNexusHP"] -= 1
-        await self.eventsEmbed.addField(value=f"Enemy's nexus was broken and now has {self.state["enemyNexusHP"]} HP")
+        self.state.enemy_nexus_hp -= 1
+        await self.eventsEmbed.addField(value=f"Enemy's nexus was broken and now has {self.state.enemy_nexus_hp} HP")
         
     async def breakMyNexus(self):
-        self.state["myNexusHP"] -= 1
-        await self.eventsEmbed.addField(value=f"Our nexus was broken and now has {self.state["myNexusHP"]} HP")
+        self.state.my_nexus_hp -= 1
+        await self.eventsEmbed.addField(value=f"Our nexus was broken and now has {self.state.my_nexus_hp} HP")
 
     async def suddenDeathDamage(self):
         await self.eventsEmbed.addField(value="\n") 
@@ -25,12 +25,12 @@ class GameEvents():
         await self.breakMyNexus()
 
     async def die(self):
-        self.state["place"] = "goOurBase"
-        self.state["spot"] = "goOurBase"
-        players[self.user.id].health = players[self.user.id].maxHealth
+        self.state.place = "goOurBase"
+        self.state.spot = "goOurBase"
+        players[self.user.id].health = players[self.user.id].max_health
         players[self.user.id].resources["base"] = 0
         players[self.user.id].resources["mid"] = 0
-        if self.state["minute"] >= 10:
+        if self.state.minute >= 10:
             await self.suddenDeathDamage()
 
     async def fight(self):
@@ -43,14 +43,14 @@ class GameEvents():
         if enemy.health <= 0:
             await self.eventsEmbed.addField(value="You have defeated the enemy")
         else:
-            self.state["minute"] += 1
+            self.state.minute += 1
             await self.eventsEmbed.addField(value="You have been defeated and have taken a minute to respawn")
             await self.die()
         
     async def doBasicGear(self):
         players[self.user.id].weapon = WEAPONS["stoneSword"]
-        players[self.user.id].maxHealth = 30
+        players[self.user.id].max_health = 30
 
     async def doAdvancedGear(self):
         players[self.user.id].weapon = WEAPONS["diamondSword"]
-        players[self.user.id].maxHealth = 50
+        players[self.user.id].max_health = 50

@@ -10,8 +10,6 @@ async def startGame(thread, user):
     try:
         game = gameLogic.TheBridgeGame(thread, user)
         active_games[thread.id] = game
-        
-        # Run game loop
         await run_game_loop(game)
 
         # After game ends
@@ -19,12 +17,11 @@ async def startGame(thread, user):
         await asyncio.sleep(SELF_DESTRUCT_DELAY)
         
     finally:
-        # Ensure cleanup happens even if the game crashes
         active_games.pop(thread.id)
         await thread.delete()
 
 async def run_game_loop(game: gameLogic.TheBridgeGame):
     """Run the game loop until one nexus is destroyed."""
-    while game.state["myNexusHP"] > 0 and game.state["enemyNexusHP"] > 0:
+    while game.state.my_nexus_hp > 0 and game.state.enemy_nexus_hp > 0:
         await asyncio.sleep(GAME_TICK_INTERVAL)
         await game.passTime()

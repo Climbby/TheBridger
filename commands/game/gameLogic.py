@@ -4,19 +4,25 @@ from commands.game.data.probabilitiesTable import Probabilities
 from commands.game.selections.optionsSelection import OptionsSelection 
 from commands.game.gameEvents import GameEvents
 from commands.game.gameEmbed import GameEmbed
+from dataclasses import dataclass
 from random import randint
+
+INITIAL_NEXUS_HP = 15
+REGEN_AMOUNT = 5
+SUDDEN_DEATH_MINUTE = 10
+
+@dataclass(slots=True)
+class GameState:
+    enemy_nexus_hp: int = INITIAL_NEXUS_HP
+    my_nexus_hp: int = INITIAL_NEXUS_HP
+    minute: int = 0
+    enemy: Player = Player(0, "guest")
+    place: str = "goOurBase"
+    spot: str = "goOurBase"    
 
 class TheBridgeGame():
     def __init__(self, channel, user):
-        self.state = {
-            "enemyNexusHP" : 15,
-            "myNexusHP" : 15,
-            "minute" : 0,
-            "enemyCount" : 0,
-            "enemy" : Player(0, "guest"),
-            "place" : "goOurBase",
-            "spot" : "goOurBase"
-        }
+        self.state = GameState()
         self.user = user
         self.channel = channel
         self.eventsEmbed = GameEmbed()
@@ -25,52 +31,56 @@ class TheBridgeGame():
         self.options = OptionsSelection(self.optionsEmbed, self.eventsEmbed, self.state, self.nextEvent, self.events, user, channel)
     
     async def passTime(self):
-        if (self.state["myNexusHP"] <= 0 or self.state["enemyNexusHP"] <= 0):
+        """Where each game tick is processed."""
+        if (self.state.my_nexus_hp <= 0 or self.state.enemy_nexus_hp <= 0):
             await self.gameOver()
             return
         
-        await self.regenHealth(5) #regenarate some health each round
-        await self.eventsEmbed.resetEmbed()  #each round has it's embed
-        await self.optionsEmbed.resetEmbed() #each round has it's embed
-        self.state["minute"] += 1
+        await self.regenHealth(REGEN_AMOUNT)
+        await self.eventsEmbed.resetEmbed()
+        await self.optionsEmbed.resetEmbed()
+        self.state.minute += 1
         await self.options.sendOptions()
-        if (self.state["myNexusHP"] <= 0 or self.state["enemyNexusHP"] <= 0):
-            await self.eventsEmbed.setDescription(f"**This is minute {self.state["minute"]}**")
+        if (self.state.my_nexus_hp <= 0 or self.state.enemy_nexus_hp <= 0):
+            await self.eventsEmbed.setDescription(f"**This is minute {self.state.minute}**")
             await self.channel.send(embed=self.eventsEmbed.embed)
             await self.gameOver()
             return
-        if self.state["minute"] >= 10:
+        if self.state.minute >= SUDDEN_DEATH_MINUTE:
             await self.events.suddenDeathDamage()
-        await self.eventsEmbed.setDescription(f"**This is minute {self.state["minute"]}**")
+        await self.eventsEmbed.setDescription(f"**This is minute {self.state.minute}**")
         await self.channel.send(embed=self.eventsEmbed.embed)
 
     async def nextEvent(self):
-        randomProbability = randint(1,100)
-        cumulativeProbability = 0
+        """Where next event the next random event is calculated."""
         probabilities = Probabilities(self.state, self.user, self.events) 
         await probabilities.setTable()
 
-        for event, probability in probabilities.probabilitiesTable.items():
-            cumulativeProbability += probability
-            if randomProbability <= cumulativeProbability:
-                if event == "fight":
+        roll = randint(1,100)
+        cumulative = 0
+
+        for event_name, probability in probabilities.probabilitiesTable.items():
+            cumulative += probability
+            if roll <= cumulative:
+                if event_name == "fight":
                     probabilities.probabilitiesTable["fight"] *= 0.2
-                await getattr(self.events, event)()
+                await getattr(self.events, event_name)()
                 break
 
-
-    async def regenHealth(self, rHealth):
-        if rHealth + players[self.user.id].health > players[self.user.id].maxHealth:
-            players[self.user.id].health = players[self.user.id].maxHealth
-        else: 
-            players[self.user.id].health += rHealth
+    async def regenHealth(self, regenerated_health):
+        """Regenerate some health each round."""
+        players[self.user.id].health = min(
+            players[self.user.id].health + regenerated_health,
+            players[self.user.id].max_health
+        )
 
     async def gameOver(self):
-        await self.channel.send("# Game ENDED!")
-
-        if (self.state["myNexusHP"] <= 0 and self.state["enemyNexusHP"] <= 0):
-            await self.channel.send("ITS A TIE!")
-        elif self.state["myNexusHP"] <= 0:
-            await self.channel.send("you lost.....")
+        """If the game is over, send the outcome feedback."""
+        if self.state.my_nexus_hp <= 0 and self.state.enemy_nexus_hp <= 0:
+            outcome = "ITS A TIE!"
+        elif self.state.my_nexus_hp <= 0:
+            outcome = "you lost....."
         else:
-            await self.channel.send("you WON!!!!!!")
+            outcome = "you WON!!!!!!"
+
+        await self.channel.send(f"# Game ENDED!\n{outcome}")

@@ -19,19 +19,19 @@ class Probabilities():
 
         pTable = {"minutePass" : 100, "breakMyNexus": 0, "breakEnemyNexus": 0}
 
-        if self.state["place"] == "goOurBase":
-            if self.state["minute"] >= 3:
+        if self.state.place == "goOurBase":
+            if self.state.minute >= 3:
                 pTable = {"minutePass" : 70, "fight" : 10, "breakMyNexus": 10, "breakEnemyNexus": 10}
-        elif self.state["place"] == "goMid":
+        elif self.state.place == "goMid":
             pTable = {"minutePass" : 50, "fight" : 30, "breakMyNexus": 10, "breakEnemyNexus": 10}
-        elif self.state["place"] == "goEnemyBase":
+        elif self.state.place == "goEnemyBase":
             pTable = {"minutePass" : 30, "fight" : 50, "breakMyNexus": 10, "breakEnemyNexus": 10}
 
         return pTable
 
     async def checkSpot(self, probabilitiesTable):
 
-        match self.state["spot"]:
+        match self.state.spot:
             case "getResourcesBase":
                 players[self.user.id].resources["base"] += 1
             

@@ -9,8 +9,8 @@ class Player:
     def __init__(self, id, name):
         self.id = id
         self.name = name
-        self.maxHealth = 20
-        self.health = self.maxHealth
+        self.max_health = 20
+        self.health = self.max_health
         self.weapon = WEAPONS[DEFAULT_WEAPON]
         self.kit = None
         self.resources = {"base" : 0, "mid" : 0}
@@ -23,13 +23,13 @@ class Player:
         """Returns the formatted value of a stat for display."""
         match stat_name:
             case "health":
-                return {"❤️ Health:"    : f"{self.health}/{self.maxHealth} HP"}
+                return {"❤️ Health:"    : f"{self.health}/{self.max_health} HP"}
             
             case "weapon":
                 return {"⚔️ Weapon:"    : self.weapon["name"].capitalize()
                         }
             case "kit":
-                return {"🎒 Kit:"       : f"{self.kit} KIT"}  
+                return {"🎒 Kit:"       : f"{self.kit} KIT"} 
             
             case "resources":
                 return {"💰 Resources:" : f"{self.resources["base"]} (basic)\n"
