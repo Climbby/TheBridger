@@ -67,23 +67,13 @@ class KitsButton(discord.ui.View):
     async def _process_kit_choice(self):
         from commands.commands import create_stats_embed
 
-        getattr(self, f"process_{self.player.kit.lower()}")()
         for kit in KITS:
             if kit["label"] == self.player.kit:
+                kit["handler"](self.player)
                 stats_embed = create_stats_embed(self.player, self.owner.display_name, color=kit["color"])
                 await self.thread.send(content=f"# __{kit["label"]}__ {kit["emoji"]} Activated!", embed=stats_embed)
                 await asyncio.sleep(1)
                 await self.thread.send("_(you can do /mystats during the game)_")
-
-    def process_tank(self):
-        self.player.max_health = 30
-        self.player.health = self.player.max_health
-
-    def process_hero(self):
-        self.player.weapon = WEAPONS["stoneSword"]
-
-    def process_medic(self):
-        self.player.weapon = WEAPONS["healingBow"]
         
     async def on_timeout(self):
 
@@ -92,4 +82,4 @@ class KitsButton(discord.ui.View):
             
         await self.message.edit(view=self)
         await asyncio.sleep(3600)
-        await self.message.edit(view=None)
+        await self.message.edit(view=None)       

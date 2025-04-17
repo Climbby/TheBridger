@@ -1,11 +1,14 @@
+from random import choice
 from commands.game.data.playerStats import players, Player
 from commands.game.data.weapons import WEAPONS
+from commands.game.data.kits import KITS
 
 class GameEvents():
     def __init__(self, state, user, eventsEmbed):
         self.state = state
         self.user = user
         self.eventsEmbed = eventsEmbed
+        self.enemy = None
 
     async def minute_pass(self):
         pass 
@@ -36,22 +39,22 @@ class GameEvents():
 
     async def whos_fighting(self, fighter="enemy"):
         """Makes you fight the enemy, the fighter deals the first blow"""
-        enemy = Player(0, "guest")
-        enemy.weapon = WEAPONS["stoneSword"]
+        self.enemy = Player(0, "guest")
+        choice(KITS)["handler"](self.enemy)
         
         # fighter deals the first blow
         if fighter == "me":
-            enemy.health -= players[self.user.id].weapon["damage"]
+            self.enemy.health -= players[self.user.id].weapon["damage"]
         else:
-            players[self.user.id].health -= enemy.weapon["damage"]
+            players[self.user.id].health -= self.enemy.weapon["damage"]
 
         # we fight until the death 
-        while enemy.health > 0 and players[self.user.id].health > 0:
-            enemy.health -= players[self.user.id].weapon["damage"]  
-            players[self.user.id].health -= enemy.weapon["damage"]          
+        while self.enemy.health > 0 and players[self.user.id].health > 0:
+            self.enemy.health -= players[self.user.id].weapon["damage"]  
+            players[self.user.id].health -= self.enemy.weapon["damage"]          
         
         # checks which one is dead
-        if enemy.health <= 0:
+        if self.enemy.health <= 0:
             await self.eventsEmbed.addField(value="You have defeated the enemy")
         elif players[self.user.id].health <= 0:
             self.state.minute += 1

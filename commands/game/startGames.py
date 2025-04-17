@@ -37,5 +37,5 @@ class GameStarter:
         """If the player is afk, the thread will be deleted"""
         try:
             await self.thread.delete()
-        except Exception as e:
+        except Exception:
             await self.channel.send(content=f"{self.user.mention} Your game was deleted because you were afk for 5 minutes.")   

@@ -35,7 +35,12 @@ class OptionsSelection():
         """Sends the embed with the options available and the respective buttons."""
         self.build_available_options()
         view = await self.prepare_options_embed()
-        await self.channel.send(embed=self.optionsEmbed.embed, view=view)
+
+        try:
+            await self.channel.send(embed=self.optionsEmbed.embed, view=view)
+        except Exception:
+            pass
+
         await view.done.wait()
 
     def build_available_options(self):

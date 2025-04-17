@@ -77,7 +77,8 @@ class Probabilities():
             case "stealResources":
                 await self.events_embed.addField(name="__Action Taken:__", value=f"Their resources have been stolen")
                 self.probabilitiesTable["break_my_nexus"] -= 5
-                self.events.steal_resources() # DOESNT EXIST YET!!!!!!!!!!!!!!!!!!
+                # TAKE THEIR WEAPON AND ARMOR, enemy = default homeless player with random kit
+                self.events.steal_resources() # to do
 
             case "breakNexus":
                 await self.events_embed.addField(name="__Action Taken:__", value=f"Someone has broken the enemy nexus")

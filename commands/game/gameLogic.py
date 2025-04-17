@@ -52,7 +52,7 @@ class TheBridgeGame():
         await self.eventsEmbed.setDescription(f"**This is minute {self.state.minute}**")
         try:
             await self.channel.send(embed=self.eventsEmbed.embed)
-        except Exception as e:
+        except Exception:
             pass
 
     async def nextEvent(self):
