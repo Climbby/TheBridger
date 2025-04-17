@@ -2,7 +2,7 @@ import asyncio
 import discord
 from commands.game.data.weapons import WEAPONS
 from commands.game.data.kits import KITS
-from commands.game.startGames import startGame
+from commands.game.startGames import GameStarter
 
 class KitsButton(discord.ui.View):
     def __init__(self, player, owner):
@@ -36,7 +36,8 @@ class KitsButton(discord.ui.View):
         self.player.kit = interaction.custom_id
         await self._process_kit_choice()
         await self._disable_buttons()
-        await startGame(self.thread, self.interaction.channel, interaction.user)
+        game = GameStarter(self.thread, self.interaction.channel, interaction.user)
+        await game.startGame()
 
     async def _check_is_owner(self):
         """Checks if interaction user is the one who ran the command."""

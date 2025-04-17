@@ -2,27 +2,27 @@ from commands.game.data.playerStats import players, Player
 from commands.game.data.weapons import WEAPONS
 
 class GameEvents():
-    def __init__(self, eventsEmbed, state, user):
-        self.eventsEmbed = eventsEmbed
+    def __init__(self, state, user, eventsEmbed):
         self.state = state
         self.user = user
+        self.eventsEmbed = eventsEmbed
 
-    async def minutePass(self):
+    async def minute_pass(self):
         pass 
 
-    async def breakEnemyNexus(self):
+    async def break_enemy_nexus(self):
         self.state.enemy_nexus_hp -= 1
         await self.eventsEmbed.addField(value=f"Enemy's nexus was broken and now has {self.state.enemy_nexus_hp} HP")
         
-    async def breakMyNexus(self):
+    async def break_my_nexus(self):
         self.state.my_nexus_hp -= 1
         await self.eventsEmbed.addField(value=f"Our nexus was broken and now has {self.state.my_nexus_hp} HP")
 
     async def suddenDeathDamage(self):
         await self.eventsEmbed.addField(value="\n") 
         await self.eventsEmbed.addField(value=f"**Sudden death is dealing 1 damage to each nexus**") 
-        await self.breakEnemyNexus()
-        await self.breakMyNexus()
+        await self.break_enemy_nexus()
+        await self.break_my_nexus()
 
     async def die(self):
         self.state.place = "goOurBase"

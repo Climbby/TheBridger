@@ -19,14 +19,14 @@ class Probabilities():
         """Adjust probabilities based on the area you're in"""
 
         # if in our base and before minute 5
-        pTable = {"minutePass" : 100, "breakMyNexus": 0, "breakEnemyNexus": 0}
+        pTable = {"minute_pass" : 100, "break_my_nexus": 0, "break_enemy_nexus": 0}
 
         if self.state.place == "goOurBase" and self.state.minute >= 5:
-            pTable = {"minutePass" : 70, "fight" : 10, "breakMyNexus": 10, "breakEnemyNexus": 10}
+            pTable = {"minute_pass" : 70, "fight" : 10, "break_my_nexus": 10, "break_enemy_nexus": 10}
         elif self.state.place == "goMid":
-            pTable = {"minutePass" : 50, "fight" : 30, "breakMyNexus": 10, "breakEnemyNexus": 10}
+            pTable = {"minute_pass" : 50, "fight" : 30, "break_my_nexus": 10, "break_enemy_nexus": 10}
         elif self.state.place == "goEnemyBase":
-            pTable = {"minutePass" : 30, "fight" : 50, "breakMyNexus": 10, "breakEnemyNexus": 10}
+            pTable = {"minute_pass" : 30, "fight" : 50, "break_my_nexus": 10, "break_enemy_nexus": 10}
 
         return pTable
 
@@ -48,23 +48,24 @@ class Probabilities():
 
             case "fight":
                 await self.events.fight()
-                self.probabilitiesTable["breakMyNexus"] -= 5
-                self.probabilitiesTable["minutePass"] += 5 
+                self.probabilitiesTable["break_my_nexus"] -= 5
+                self.probabilitiesTable["minute_pass"] += 5 
 
             case "defend":
-                self.probabilitiesTable["breakMyNexus"] -= 10   
-                self.probabilitiesTable["minutePass"] += 10  
+                self.probabilitiesTable["break_my_nexus"] -= 10   
+                self.probabilitiesTable["minute_pass"] += 10  
 
             case "stealResources":
-                self.probabilitiesTable["breakMyNexus"] -= 10   
-                self.probabilitiesTable["breakEnemyNexus"] += 10  
+                self.probabilitiesTable["break_my_nexus"] -= 10   
+                self.probabilitiesTable["break_enemy_nexus"] += 10  
 
             case "breakNexus":
+                self.events.break_enemy_nexus()
                 if self.changePerMinute == None:
-                    self.probabilitiesTable["breakEnemyNexus"] = self.probabilitiesTable["fight"]
-                    self.probabilitiesTable["fight"] = self.probabilitiesTable["minutePass"]
-                    self.probabilitiesTable["minutePass"] = 0
+                    self.probabilitiesTable["break_enemy_nexus"] = self.probabilitiesTable["fight"]
+                    self.probabilitiesTable["fight"] = self.probabilitiesTable["minute_pass"]
+                    self.probabilitiesTable["minute_pass"] = 0
                 else:        
-                    self.probabilitiesTable["breakEnemyNexus"] -= self.changePerMinute
+                    self.probabilitiesTable["break_enemy_nexus"] -= self.changePerMinute
                     self.probabilitiesTable["fight"] += self.changePerMinute
-                self.changePerMinute = 0.1 * self.probabilitiesTable["breakEnemyNexus"]
+                self.changePerMinute = 0.1 * self.probabilitiesTable["break_enemy_nexus"]
