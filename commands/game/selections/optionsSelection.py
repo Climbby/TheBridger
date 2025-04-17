@@ -71,7 +71,7 @@ class OptionsSelection():
 
 class OptionsButtons(discord.ui.View):
     def __init__(self, state, channel, eventsEmbed, doNextEvent, events, listOfOptions):
-        super().__init__(timeout=5)
+        super().__init__(timeout=300)
         self.state = state
         self.channel = channel
         self.eventsEmbed = eventsEmbed

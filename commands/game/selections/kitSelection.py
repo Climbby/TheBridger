@@ -36,7 +36,7 @@ class KitsButton(discord.ui.View):
         self.player.kit = interaction.custom_id
         await self._process_kit_choice()
         await self._disable_buttons()
-        game = GameStarter(self.thread, self.interaction.channel, interaction.user)
+        game = GameStarter(self.thread, interaction.channel, interaction.user)
         await game.startGame()
 
     async def _check_is_owner(self):

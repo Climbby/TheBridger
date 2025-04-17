@@ -18,7 +18,8 @@ class GameEvents():
         self.state.my_nexus_hp -= 1
         await self.eventsEmbed.addField(value=f"Our nexus was broken and now has {self.state.my_nexus_hp} HP")
 
-    async def suddenDeathDamage(self):
+    async def sudden_death(self):
+        """Removes 1 Health from each nexus per game tick."""
         await self.eventsEmbed.addField(value="\n") 
         await self.eventsEmbed.addField(value=f"**Sudden death is dealing 1 damage to each nexus**") 
         await self.break_enemy_nexus()
@@ -31,7 +32,7 @@ class GameEvents():
         players[self.user.id].resources["base"] = 0
         players[self.user.id].resources["mid"] = 0
         if self.state.minute >= 10:
-            await self.suddenDeathDamage()
+            await self.sudden_death()
 
     async def fight(self):
         enemy = Player(0, "guest")

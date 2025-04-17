@@ -23,11 +23,11 @@ class GameState:
 class TheBridgeGame():
     def __init__(self, channel, user):
         self.state = GameState()
-        self.user = user
         self.channel = channel
+        self.user = user
         self.eventsEmbed = GameEmbed()
         self.optionsEmbed = GameEmbed()
-        self.events = GameEvents(self.eventsEmbed, self.state, user)
+        self.events = GameEvents(self.state, user, self.eventsEmbed)
         self.options = OptionsSelection(self.optionsEmbed, self.eventsEmbed, self.state, self.nextEvent, self.events, user, channel)
     
     async def passTime(self):
@@ -47,7 +47,7 @@ class TheBridgeGame():
             await self.gameOver()
             return
         if self.state.minute >= SUDDEN_DEATH_MINUTE:
-            await self.events.suddenDeathDamage()
+            await self.events.sudden_death()
         await self.eventsEmbed.setDescription(f"**This is minute {self.state.minute}**")
         await self.channel.send(embed=self.eventsEmbed.embed)
 

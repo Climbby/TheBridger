@@ -60,7 +60,7 @@ class Probabilities():
                 self.probabilitiesTable["break_enemy_nexus"] += 10  
 
             case "breakNexus":
-                self.events.break_enemy_nexus()
+                await self.events.break_enemy_nexus()
                 if self.changePerMinute == None:
                     self.probabilitiesTable["break_enemy_nexus"] = self.probabilitiesTable["fight"]
                     self.probabilitiesTable["fight"] = self.probabilitiesTable["minute_pass"]
