@@ -26,7 +26,7 @@ class GameEvents():
         await self.break_my_nexus()
 
     async def die(self):
-        self.state.place = "goOurBase"
+        self.state.area = "goOurBase"
         self.state.spot = "goOurBase"
         players[self.user.id].health = players[self.user.id].max_health
         players[self.user.id].resources["base"] = 0
@@ -34,19 +34,38 @@ class GameEvents():
         if self.state.minute >= 10:
             await self.sudden_death()
 
-    async def fight(self):
+    async def whos_fighting(self, fighter="enemy"):
+        """Makes you fight the enemy, the fighter deals the first blow"""
         enemy = Player(0, "guest")
+        enemy.weapon = WEAPONS["stoneSword"]
+        
+        # fighter deals the first blow
+        if fighter == "me":
+            enemy.health -= players[self.user.id].weapon["damage"]
+        else:
+            players[self.user.id].health -= enemy.weapon["damage"]
 
-        while (enemy.health > 0 and players[self.user.id].health > 0):
+        # we fight until the death 
+        while enemy.health > 0 and players[self.user.id].health > 0:
             enemy.health -= players[self.user.id].weapon["damage"]  
             players[self.user.id].health -= enemy.weapon["damage"]          
         
+        # checks which one is dead
         if enemy.health <= 0:
             await self.eventsEmbed.addField(value="You have defeated the enemy")
-        else:
+        elif players[self.user.id].health <= 0:
             self.state.minute += 1
             await self.eventsEmbed.addField(value="You have been defeated and have taken a minute to respawn")
             await self.die()
+
+    def open_nexus(self):
+        pass
+
+    def defend_nexus(self):
+        pass
+
+    def steal_resources(self):
+        pass
         
     def doBasicGear(self):
         players[self.user.id].weapon = WEAPONS["stoneSword"]

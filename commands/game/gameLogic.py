@@ -17,7 +17,7 @@ class GameState:
     my_nexus_hp: int = INITIAL_NEXUS_HP
     minute: int = 0
     enemy: Player = Player(0, "guest")
-    place: str = "goOurBase"
+    area: str = "goOurBase"
     spot: str = "goOurBase"    
 
 class TheBridgeGame():
@@ -29,6 +29,7 @@ class TheBridgeGame():
         self.optionsEmbed = GameEmbed()
         self.events = GameEvents(self.state, user, self.eventsEmbed)
         self.options = OptionsSelection(self.optionsEmbed, self.eventsEmbed, self.state, self.nextEvent, self.events, user, channel)
+        self.probabilities = Probabilities(self.state, self.user, self.eventsEmbed, self.events)
     
     async def passTime(self):
         """Where each game tick is processed."""
@@ -49,21 +50,21 @@ class TheBridgeGame():
         if self.state.minute >= SUDDEN_DEATH_MINUTE:
             await self.events.sudden_death()
         await self.eventsEmbed.setDescription(f"**This is minute {self.state.minute}**")
-        await self.channel.send(embed=self.eventsEmbed.embed)
+        try:
+            await self.channel.send(embed=self.eventsEmbed.embed)
+        except Exception as e:
+            pass
 
     async def nextEvent(self):
-        """Where next event the next random event is calculated."""
-        probabilities = Probabilities(self.state, self.user, self.events) 
-        await probabilities.set_table()
+        """Where next event the next random event is calculated.""" 
+        await self.probabilities.set_table()
 
         roll = randint(1,100)
         cumulative = 0
 
-        for event_name, probability in probabilities.probabilitiesTable.items():
+        for event_name, probability in self.probabilities.probabilitiesTable.items():
             cumulative += probability
             if roll <= cumulative:
-                if event_name == "fight":
-                    probabilities.probabilitiesTable["fight"] *= 0.2
                 await getattr(self.events, event_name)()
                 break
 

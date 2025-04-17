@@ -38,4 +38,4 @@ class GameStarter:
         try:
             await self.thread.delete()
         except Exception as e:
-            await self.channel.send(content="Game was deleted because you were afk.", ephemeral=True)   
+            await self.channel.send(content=f"{self.user.mention} Your game was deleted because you were afk for 5 minutes.")   

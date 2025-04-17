@@ -55,11 +55,11 @@ class OptionsSelection():
         if players[self.user.id].resources["mid"] >= 3:
             self.options_available["goOurBase"].append("doAdvancedGear")
 
-        self.list_of_options = [option for option in self.options_available[self.state.place]]
+        self.list_of_options = [option for option in self.options_available[self.state.area]]
 
     async def prepare_options_embed(self):
         await self.optionsEmbed.setDescription(
-            description=f"Choose your option, you're in {OPTIONS_DISPLAY_NAME[f"{self.state.place}_place"]}"
+            description=f"Choose your option, you're in {OPTIONS_DISPLAY_NAME[f"{self.state.area}_place"]}"
         )
 
         for i in range(len(self.list_of_options)):
@@ -90,17 +90,14 @@ class OptionsButtons(discord.ui.View):
             btn.callback = self.handle_selection
             self.add_item(btn)
 
-    async def _check_option_place(self):
+    async def _place_setter(self):
+        """Sets area and spot from option chosen."""
 
         chosen_option = self.interaction.custom_id
 
         if chosen_option in ["goOurBase", "goMid", "goEnemyBase"]:
-            self.state.place = chosen_option
-        elif chosen_option in ["doBasicGear", "doAdvancedGear"]:
-            getattr(self.events, chosen_option)()
-
+            self.state.area = chosen_option
         self.state.spot = chosen_option
-        await self.eventsEmbed.addField(name="Action Taken:", value=f"Option Chosen was: {chosen_option}") # PRECISA SER MUDADO
 
     async def _disable_buttons(self):
 
@@ -114,10 +111,11 @@ class OptionsButtons(discord.ui.View):
 
         self.interaction = interaction
         await interaction.response.defer(ephemeral=True)
-        await self._check_option_place()
+        await self._place_setter()
         await self.doNextEvent()
         await self._disable_buttons()
         self.done.set()
 
     async def on_timeout(self):
+        self.done.set()
         await self.channel.delete()
