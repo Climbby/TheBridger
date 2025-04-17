@@ -28,40 +28,36 @@ class OptionsSelection():
         self.events = events
         self.user = user
         self.channel = channel
+        self.options_available = None
+        self.list_of_options = None
+
+    async def sendOptions(self):
+        """Sends the embed with the options available and the respective buttons."""
+        self.build_available_options()
+        view = await self.prepare_options_embed()
+        await self.channel.send(embed=self.optionsEmbed.embed, view=view)
+        await view.done.wait()
+
+    def build_available_options(self):
+
         self.options_available = {
             "goOurBase": ["getResourcesBase", "defend"],
             "goMid": ["goOurBase", "fight", "getResourcesMid", "goEnemyBase"],
             "goEnemyBase": ["goMid", "breakNexus", "fight", "stealResources"]
         }
-        self.list_of_options = None
 
-    async def sendOptions(self):
-        """Sends the embed with the options available and the respective buttons."""
-        self._check_available_options()
-        view = await self._prepare_options_embed()
-        await self.channel.send(embed=self.optionsEmbed.embed, view=view)
-        await view.done.wait()
-
-    def _check_available_options(self):
-
-        #avoids duplicates
-        for option in ["goMid", "doBasicGear", "doAdvancedGear"]:
-            if option in self.options_available["goOurBase"]:
-                continue
-
-        #checks specific cases
-        if self.state.minute >= 3:
+        if self.state.minute >= 5:
             self.options_available["goOurBase"].append("goMid")
 
-        if players[self.user.id].resources["base"] > 0:
+        if players[self.user.id].resources["base"] >= 3:
             self.options_available["goOurBase"].append("doBasicGear")
 
-        if players[self.user.id].resources["mid"] > 0:
+        if players[self.user.id].resources["mid"] >= 3:
             self.options_available["goOurBase"].append("doAdvancedGear")
 
         self.list_of_options = [option for option in self.options_available[self.state.place]]
 
-    async def _prepare_options_embed(self):
+    async def prepare_options_embed(self):
         await self.optionsEmbed.setDescription(
             description=f"Choose your option, you're in {OPTIONS_DISPLAY_NAME[f"{self.state.place}_place"]}"
         )
@@ -96,13 +92,15 @@ class OptionsButtons(discord.ui.View):
 
     async def _check_option_place(self):
 
-        if self.interaction.custom_id in ["goOurBase", "goMid", "goEnemyBase"]:
-            self.state.place = self.interaction.custom_id
-            self.state.spot = self.interaction.custom_id
+        chosen_option = self.interaction.custom_id
 
-        else:
-            self.state.spot = self.interaction.data["custom_id"]
-            await self.do_event(self.interaction.data["custom_id"]) 
+        if chosen_option in ["goOurBase", "goMid", "goEnemyBase"]:
+            self.state.place = chosen_option
+        elif chosen_option in ["doBasicGear", "doAdvancedGear"]:
+            getattr(self.events, chosen_option)()
+
+        self.state.spot = chosen_option
+        await self.eventsEmbed.addField(name="Action Taken:", value=f"Option Chosen was: {chosen_option}") # PRECISA SER MUDADO
 
     async def _disable_buttons(self):
 
@@ -112,20 +110,14 @@ class OptionsButtons(discord.ui.View):
         await self.interaction.edit_original_response(view=self)
 
     async def handle_selection(self, interaction):
+        """When the options button is clicked, this happens."""
+
         self.interaction = interaction
         await interaction.response.defer(ephemeral=True)
         await self._check_option_place()
         await self.doNextEvent()
         await self._disable_buttons()
         self.done.set()
-
-    async def do_event(self, chosen_option):
-        """Does specific event cases."""
-
-        if chosen_option == "doBasicGear" or chosen_option == "doAdvancedGear": 
-            await getattr(self.events, chosen_option)
-
-        await self.eventsEmbed.addField(name="Action Taken:", value=f"Option Chosen was: {chosen_option}")
 
     async def on_timeout(self):
         await self.channel.delete()

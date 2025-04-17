@@ -29,7 +29,6 @@ class KitsButton(discord.ui.View):
         self.interaction = interaction
 
         if not await self._check_is_owner():
-            print("AAA")
             return
 
         self.thread = await self._create_thread()
@@ -43,7 +42,7 @@ class KitsButton(discord.ui.View):
         """Checks if interaction user is the one who ran the command."""
 
         if self.interaction.user.id != self.owner.id:
-            await self.interaction.response.send_message("❌ Only the command user can select the kit!", ephemeral=True)
+            await self.interaction.channel.send("❌ Only the command user can select the kit!", ephemeral=True)
             return False 
         
         return True      

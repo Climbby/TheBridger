@@ -47,10 +47,10 @@ class GameEvents():
             await self.eventsEmbed.addField(value="You have been defeated and have taken a minute to respawn")
             await self.die()
         
-    async def doBasicGear(self):
+    def doBasicGear(self):
         players[self.user.id].weapon = WEAPONS["stoneSword"]
         players[self.user.id].max_health = 30
 
-    async def doAdvancedGear(self):
+    def doAdvancedGear(self):
         players[self.user.id].weapon = WEAPONS["diamondSword"]
         players[self.user.id].max_health = 50

@@ -54,7 +54,7 @@ class TheBridgeGame():
     async def nextEvent(self):
         """Where next event the next random event is calculated."""
         probabilities = Probabilities(self.state, self.user, self.events) 
-        await probabilities.setTable()
+        await probabilities.set_table()
 
         roll = randint(1,100)
         cumulative = 0
