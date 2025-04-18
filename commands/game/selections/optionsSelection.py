@@ -54,8 +54,16 @@ class OptionsSelection():
         if self.state.minute >= 5:
             self.options_available["goOurBase"].append("goMid")
 
+        if players[self.user.id].has_fought:
+            self.options_available["goMid"].remove("fight")
+            self.options_available["goEnemyBase"].remove("fight")
+
+        if players[self.user.id].has_stolen:
+            self.options_available["goEnemyBase"].remove("stealResources")
+
         if players[self.user.id].gear in ["basic", "advanced"]:
             self.options_available["goOurBase"].remove("getResourcesBase")
+
         if players[self.user.id].gear == "advanced":
             self.options_available["goMid"].remove("getResourcesMid") 
 
@@ -104,7 +112,6 @@ class OptionsButtons(discord.ui.View):
 
     async def _place_setter(self):
         """Sets area and spot from option chosen."""
-
         chosen_option = self.interaction.custom_id
 
         if chosen_option in ["goOurBase", "goMid", "goEnemyBase"]:

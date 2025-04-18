@@ -1,5 +1,7 @@
 from commands.game.data.playerStats import players
 
+FIGHTING_COOLDOWN = 1
+
 class Probabilities():
 
     def __init__(self, state, user, events_embed, events):
@@ -8,6 +10,7 @@ class Probabilities():
         self.events_embed = events_embed
         self.events = events
         self.opening_nexus_count = 0
+        self.fighting_cooldown = 0
         self.nexus_open = False 
         self.probabilitiesTable = None
 
@@ -37,6 +40,10 @@ class Probabilities():
         if self.nexus_open:
             probabilitiesTable["break_my_nexus"] += 10
             probabilitiesTable["break_enemy_nexus"] += 10
+
+        if players[self.user.id].has_fought:
+            probabilitiesTable["whos_fighting"] = 0
+            players[self.user.id].has_fought = False
 
         return probabilitiesTable
 
@@ -77,7 +84,7 @@ class Probabilities():
                     self.nexus_open = True
 
             case "stealResources":
-                await self.events_embed.addField(name="__Action Taken:__", value=f"Their resources have been stolen")
+                await self.events_embed.addField(name="__Action Taken:__", value=f"You've stolen the enemy's weapon")
                 self.probabilitiesTable["break_my_nexus"] -= 5
                 self.events.steal_resources()
 

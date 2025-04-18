@@ -58,6 +58,8 @@ class GameEvents():
             self.state.is_dead = True
             await self.die()
 
+        players[self.user.id].has_fought = True
+        players[self.user.id].has_stolen = False
         self.enemy = Player(0, "guest")
         choice(KITS)["handler"](self.enemy)
 
@@ -68,6 +70,7 @@ class GameEvents():
 
     def steal_resources(self):
         self.enemy.weapon = WEAPONS["hand"]
+        players[self.user.id].has_stolen = True
         
     def doBasicGear(self):
         players[self.user.id].gear = "basic"

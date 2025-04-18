@@ -12,6 +12,8 @@ class Player:
         self.max_health = 20
         self.health = self.max_health
         self.weapon = WEAPONS[DEFAULT_WEAPON]
+        self.has_fought = False
+        self.has_stolen = False
         self.gear = None
         self.kit = None
         self.resources = {"base" : 0, "mid" : 0}
