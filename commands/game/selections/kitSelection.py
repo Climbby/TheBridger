@@ -82,4 +82,7 @@ class KitsButton(discord.ui.View):
             
         await self.message.edit(view=self)
         await asyncio.sleep(3600)
-        await self.message.edit(view=None)       
+        try:
+            await self.message.edit(view=None)       
+        except Exception:
+            pass

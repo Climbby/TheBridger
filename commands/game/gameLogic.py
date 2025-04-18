@@ -18,8 +18,7 @@ class GameState:
     minute: int = 0
     enemy: Player = Player(0, "guest")
     area: str = "goOurBase"
-    spot: str = "goOurBase"
-    is_dead: bool = False    
+    spot: str = "goOurBase"    
 
 class TheBridgeGame():
     def __init__(self, channel, user):
@@ -40,19 +39,22 @@ class TheBridgeGame():
         self.state.minute += 1
         await self.options.sendOptions()
 
+        if players[self.user.id].is_dead:
+            self.events_embed.color = 0x474747
+
         if self.state.my_nexus_hp <= 0 or self.state.enemy_nexus_hp <= 0:
-            await self.events_embed.setDescription(f"**This is minute {self.state.minute}**")
+            await self.events_embed.setDescription(f"**Minute {self.state.minute}** ⏱️")
             await self.channel.send(embed=self.events_embed.embed)
             await self.gameOver()
             return
         
-        if self.state.is_dead:
+        if players[self.user.id].is_dead:
             await self.nextEvent()
             if self.state.minute >= SUDDEN_DEATH_MINUTE:
                 await self.events.sudden_death()
 
         if (self.state.my_nexus_hp <= 0 or self.state.enemy_nexus_hp <= 0):
-            await self.events_embed.setDescription(f"**This is minute {self.state.minute}**")
+            await self.events_embed.setDescription(f"**Minute {self.state.minute}** ⏱️")
             await self.channel.send(embed=self.events_embed.embed)
             await self.gameOver()
             return
@@ -61,13 +63,14 @@ class TheBridgeGame():
             await self.events.sudden_death()
 
         if (self.state.my_nexus_hp <= 0 or self.state.enemy_nexus_hp <= 0):
-            await self.events_embed.setDescription(f"**This is minute {self.state.minute}**")
+            await self.events_embed.setDescription(f"**Minute {self.state.minute}** ⏱️")
             await self.channel.send(embed=self.events_embed.embed)
             await self.gameOver()
             return
 
         try:
-            await self.events_embed.setDescription(f"**This is minute {self.state.minute}**")
+            await self.events_embed.setDescription(f"**Minute {self.state.minute}** ⏱️")
+            self.events_embed.color = 0x474747
             await self.channel.send(embed=self.events_embed.embed)
         except Exception:
             pass

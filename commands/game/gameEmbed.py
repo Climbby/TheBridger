@@ -14,6 +14,9 @@ class GameEmbed:
             color= 0xDEE0FC
         )
         
+    def set_color(self):
+        pass
+
     async def setDescription(self, description):
         self.embed.description = description
 

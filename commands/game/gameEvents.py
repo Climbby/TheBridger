@@ -23,12 +23,12 @@ class GameEvents():
     async def sudden_death(self):
         """Removes 1 Health from each nexus per game tick."""
         await self.events_embed.addField(value="\n") 
-        await self.events_embed.addField(value=f"**Sudden death is dealing 1 damage to each nexus**") 
+        await self.events_embed.addField(value=f"**🚨 Sudden death is dealing 1 damage to each nexus🚨 **") 
         await self.break_enemy_nexus()
         await self.break_my_nexus()
 
     async def die(self):
-        await self.events_embed.addField(value="You have been defeated and have taken a minute to respawn")
+        await self.events_embed.addField(value="💀 You have been defeated and have taken a minute to respawn")
         self.state.minute += 1
         self.state.area = "goOurBase"
         self.state.spot = "goOurBase"
@@ -42,6 +42,7 @@ class GameEvents():
         
         # fighter deals the first blow
         if fighter == "me":
+            players[self.user.id].has_fought = True
             self.enemy.health -= players[self.user.id].weapon["damage"]
         else:
             players[self.user.id].health -= self.enemy.weapon["damage"]
@@ -52,20 +53,24 @@ class GameEvents():
             players[self.user.id].health -= self.enemy.weapon["damage"]          
         
         # checks which one is dead
-        if self.enemy.health <= 0:
-            await self.events_embed.addField(value="You have defeated the enemy")
-        elif players[self.user.id].health <= 0:
-            self.state.is_dead = True
+        if players[self.user.id].health <= 0:
+            players[self.user.id].is_dead = True
             await self.die()
+        if self.enemy.health <= 0:
+            await self.events_embed.addField(
+                value=f"⚔️ You have defeated the enemy ⚔️\n \
+                        Your Health: ❤️ {players[self.user.id].health}/{players[self.user.id].max_health} HP")
 
-        players[self.user.id].has_fought = True
         players[self.user.id].has_stolen = False
         self.enemy = Player(0, "guest")
         choice(KITS)["handler"](self.enemy)
 
     async def open_nexus(self):
         self.open_nexus_count += 1
-        await self.events_embed.addField(name="__Action Taken:__", value=f"You've started to open the nexus area {self.open_nexus_count}/3")
+        await self.events_embed.addField(
+            name="__Action Taken:__",
+            value=f"⚒️ You've started to open the nexus area {self.open_nexus_count}/3 ⚒️"
+        )
         return self.open_nexus_count == 3
 
     def steal_resources(self):

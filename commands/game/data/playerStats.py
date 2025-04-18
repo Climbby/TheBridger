@@ -14,6 +14,7 @@ class Player:
         self.weapon = WEAPONS[DEFAULT_WEAPON]
         self.has_fought = False
         self.has_stolen = False
+        self.is_dead = False
         self.gear = None
         self.kit = None
         self.resources = {"base" : 0, "mid" : 0}
