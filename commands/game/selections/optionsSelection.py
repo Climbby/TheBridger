@@ -20,9 +20,9 @@ OPTIONS_DISPLAY_NAME = {
 }
 
 class OptionsSelection():
-    def __init__(self, optionsEmbed, eventsEmbed, state, doNextEvent, events, user, channel):
-        self.optionsEmbed = optionsEmbed
-        self.eventsEmbed = eventsEmbed
+    def __init__(self, options_embed, events_embed, state, doNextEvent, events, user, channel):
+        self.options_embed = options_embed
+        self.events_embed = events_embed
         self.state = state
         self.doNextEvent = doNextEvent
         self.events = events
@@ -37,7 +37,7 @@ class OptionsSelection():
         view = await self.prepare_options_embed()
 
         try:
-            await self.channel.send(embed=self.optionsEmbed.embed, view=view)
+            await self.channel.send(embed=self.options_embed.embed, view=view)
         except Exception:
             pass
 
@@ -54,32 +54,39 @@ class OptionsSelection():
         if self.state.minute >= 5:
             self.options_available["goOurBase"].append("goMid")
 
-        if players[self.user.id].resources["base"] >= 3:
-            self.options_available["goOurBase"].append("doBasicGear")
+        if players[self.user.id].gear in ["basic", "advanced"]:
+            self.options_available["goOurBase"].remove("getResourcesBase")
+        if players[self.user.id].gear == "advanced":
+            self.options_available["goMid"].remove("getResourcesMid") 
 
-        if players[self.user.id].resources["mid"] >= 3:
+        if players[self.user.id].resources["base"] == 3:
+            self.options_available["goOurBase"].append("doBasicGear")
+            self.options_available["goOurBase"].remove("getResourcesBase")
+
+        if players[self.user.id].resources["mid"] == 3:
             self.options_available["goOurBase"].append("doAdvancedGear")
+            self.options_available["goMid"].remove("getResourcesMid")
 
         self.list_of_options = [option for option in self.options_available[self.state.area]]
 
     async def prepare_options_embed(self):
-        await self.optionsEmbed.setDescription(
+        await self.options_embed.setDescription(
             description=f"Choose your option, you're in {OPTIONS_DISPLAY_NAME[f"{self.state.area}_place"]}"
         )
 
         for i in range(len(self.list_of_options)):
-            await self.optionsEmbed.addField(name=f"**Option {i+1}:**", value=OPTIONS_DISPLAY_NAME[self.list_of_options[i]])
+            await self.options_embed.addField(name=f"**Option {i+1}:**", value=OPTIONS_DISPLAY_NAME[self.list_of_options[i]])
 
-        view = OptionsButtons(self.state, self.channel, self.eventsEmbed, self.doNextEvent, self.events, self.list_of_options)
+        view = OptionsButtons(self.state, self.channel, self.events_embed, self.doNextEvent, self.events, self.list_of_options)
         return view      
 
 
 class OptionsButtons(discord.ui.View):
-    def __init__(self, state, channel, eventsEmbed, doNextEvent, events, listOfOptions):
+    def __init__(self, state, channel, events_embed, doNextEvent, events, listOfOptions):
         super().__init__(timeout=300)
         self.state = state
         self.channel = channel
-        self.eventsEmbed = eventsEmbed
+        self.events_embed = events_embed
         self.doNextEvent = doNextEvent
         self.events = events
         self.list_of_options = listOfOptions
@@ -123,4 +130,7 @@ class OptionsButtons(discord.ui.View):
 
     async def on_timeout(self):
         self.done.set()
-        await self.channel.delete()
+        try:
+            await self.channel.delete()
+        except Exception:
+            pass

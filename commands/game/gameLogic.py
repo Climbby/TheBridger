@@ -18,40 +18,57 @@ class GameState:
     minute: int = 0
     enemy: Player = Player(0, "guest")
     area: str = "goOurBase"
-    spot: str = "goOurBase"    
+    spot: str = "goOurBase"
+    is_dead: bool = False    
 
 class TheBridgeGame():
     def __init__(self, channel, user):
         self.state = GameState()
         self.channel = channel
         self.user = user
-        self.eventsEmbed = GameEmbed()
-        self.optionsEmbed = GameEmbed()
-        self.events = GameEvents(self.state, user, self.eventsEmbed)
-        self.options = OptionsSelection(self.optionsEmbed, self.eventsEmbed, self.state, self.nextEvent, self.events, user, channel)
-        self.probabilities = Probabilities(self.state, self.user, self.eventsEmbed, self.events)
+        self.events_embed = GameEmbed()
+        self.options_embed = GameEmbed()
+        self.events = GameEvents(self.state, user, self.events_embed)
+        self.options = OptionsSelection(self.options_embed, self.events_embed, self.state, self.nextEvent, self.events, user, channel)
+        self.probabilities = Probabilities(self.state, self.user, self.events_embed, self.events)
     
     async def passTime(self):
         """Where each game tick is processed."""
-        if (self.state.my_nexus_hp <= 0 or self.state.enemy_nexus_hp <= 0):
+        await self.regenHealth(REGEN_AMOUNT)
+        await self.events_embed.resetEmbed()
+        await self.options_embed.resetEmbed()
+        self.state.minute += 1
+        await self.options.sendOptions()
+
+        if self.state.my_nexus_hp <= 0 or self.state.enemy_nexus_hp <= 0:
+            await self.events_embed.setDescription(f"**This is minute {self.state.minute}**")
+            await self.channel.send(embed=self.events_embed.embed)
             await self.gameOver()
             return
         
-        await self.regenHealth(REGEN_AMOUNT)
-        await self.eventsEmbed.resetEmbed()
-        await self.optionsEmbed.resetEmbed()
-        self.state.minute += 1
-        await self.options.sendOptions()
+        if self.state.is_dead:
+            await self.nextEvent()
+            if self.state.minute >= SUDDEN_DEATH_MINUTE:
+                await self.events.sudden_death()
+
         if (self.state.my_nexus_hp <= 0 or self.state.enemy_nexus_hp <= 0):
-            await self.eventsEmbed.setDescription(f"**This is minute {self.state.minute}**")
-            await self.channel.send(embed=self.eventsEmbed.embed)
+            await self.events_embed.setDescription(f"**This is minute {self.state.minute}**")
+            await self.channel.send(embed=self.events_embed.embed)
             await self.gameOver()
             return
+
         if self.state.minute >= SUDDEN_DEATH_MINUTE:
             await self.events.sudden_death()
-        await self.eventsEmbed.setDescription(f"**This is minute {self.state.minute}**")
+
+        if (self.state.my_nexus_hp <= 0 or self.state.enemy_nexus_hp <= 0):
+            await self.events_embed.setDescription(f"**This is minute {self.state.minute}**")
+            await self.channel.send(embed=self.events_embed.embed)
+            await self.gameOver()
+            return
+
         try:
-            await self.channel.send(embed=self.eventsEmbed.embed)
+            await self.events_embed.setDescription(f"**This is minute {self.state.minute}**")
+            await self.channel.send(embed=self.events_embed.embed)
         except Exception:
             pass
 
@@ -59,14 +76,10 @@ class TheBridgeGame():
         """Where next event the next random event is calculated.""" 
         await self.probabilities.set_table()
 
-        roll = randint(1,100)
-        cumulative = 0
-
         for event_name, probability in self.probabilities.probabilitiesTable.items():
-            cumulative += probability
-            if roll <= cumulative:
+            roll = randint(1,100)
+            if roll <= probability:
                 await getattr(self.events, event_name)()
-                break
 
     async def regenHealth(self, regenerated_health):
         """Regenerate some health each round."""

@@ -7,8 +7,8 @@ class Probabilities():
         self.user = user
         self.events_embed = events_embed
         self.events = events
+        self.opening_nexus_count = 0
         self.nexus_open = False 
-        self.changePerMinute = None
         self.probabilitiesTable = None
 
     async def set_table(self):
@@ -21,21 +21,22 @@ class Probabilities():
         game_minute = self.state.minute
 
         if game_minute < 5:
-            return {"minute_pass" : 100}
+            return {}
             
-        probabilitiesTable = {"break_my_nexus": game_minute, "break_enemy_nexus" : game_minute}
+        probabilitiesTable = {"break_my_nexus": game_minute * 2, "break_enemy_nexus": game_minute * 2 - 10}
 
         if self.state.area == "goOurBase":
-            probabilitiesTable["minute_pass"] = 95 - 2 * game_minute
             probabilitiesTable["whos_fighting"] = 5
 
         elif self.state.area == "goMid":
-            probabilitiesTable["minute_pass"] = 70 - 2 * game_minute
             probabilitiesTable["whos_fighting"] = 30
 
         elif self.state.area == "goEnemyBase":
-            probabilitiesTable["minute_pass"] = 40 - 2 * game_minute
             probabilitiesTable["whos_fighting"] = 60
+
+        if self.nexus_open:
+            probabilitiesTable["break_my_nexus"] += 10
+            probabilitiesTable["break_enemy_nexus"] += 10
 
         return probabilitiesTable
 
@@ -66,20 +67,20 @@ class Probabilities():
                 await self.events.whos_fighting("me") 
 
             case "defend":
-                if not self.nexus_open:
-                    await self.events_embed.addField(name="__Action Taken:__", value=f"You've opened the nexus area")
+                if self.nexus_open:
+                    await self.events_embed.addField(name="__Action Taken:__", value=f"You're now defending the Nexus")
+                    if self.state.minute >= 5:
+                        self.probabilitiesTable["whos_fighting"] += self.probabilitiesTable["break_my_nexus"]
+                        self.probabilitiesTable["break_my_nexus"] = 0
+                if not self.nexus_open and await self.events.open_nexus():
+                    await self.events_embed.addField(value=f"**The Nexus is now OPEN!!!**")
                     self.nexus_open = True
-                    self.events.open_nexus() # DOESNT EXIST YET!!!!!!!!!!!!!!!!!!
-                else:
-                    await self.events_embed.addField(name="__Action Taken:__", value=f"You're defending the nexus")
-                    self.events.defend_nexus() # DOESNT EXIST YET!!!!!!!!!!!!!!!!!!
 
             case "stealResources":
                 await self.events_embed.addField(name="__Action Taken:__", value=f"Their resources have been stolen")
                 self.probabilitiesTable["break_my_nexus"] -= 5
-                # TAKE THEIR WEAPON AND ARMOR, enemy = default homeless player with random kit
-                self.events.steal_resources() # to do
+                self.events.steal_resources()
 
             case "breakNexus":
-                await self.events_embed.addField(name="__Action Taken:__", value=f"Someone has broken the enemy nexus")
+                await self.events_embed.addField(name="__Action Taken:__", value=f"You have broken the enemy nexus")
                 await self.events.break_enemy_nexus()
