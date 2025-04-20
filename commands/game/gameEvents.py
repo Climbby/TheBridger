@@ -14,18 +14,20 @@ class GameEvents():
 
     async def break_enemy_nexus(self):
         self.state.enemy_nexus_hp -= 1
-        await self.events_embed.addField(value=f"Enemy's nexus was broken and now has {self.state.enemy_nexus_hp} HP")
+        await self.events_embed.addField(value=f"⛏️ THEIR NEXUS WAS BROKEN - {self.state.enemy_nexus_hp} HP ❤️")
+        await self.events_embed.change_color(0xFF2B24)
         
     async def break_my_nexus(self):
         self.state.my_nexus_hp -= 1
-        await self.events_embed.addField(value=f"Our nexus was broken and now has {self.state.my_nexus_hp} HP")
+        await self.events_embed.addField(value=f"⛏️ OUR NEXUS WAS BROKEN 🚨 - {self.state.my_nexus_hp} HP ❤️")
+        await self.events_embed.change_color(0xFF2B24)
 
     async def sudden_death(self):
         """Removes 1 Health from each nexus per game tick."""
         await self.events_embed.addField(value="\n") 
         await self.events_embed.addField(value=f"**🚨 Sudden death is dealing 1 damage to each nexus🚨 **") 
-        await self.break_enemy_nexus()
         await self.break_my_nexus()
+        await self.break_enemy_nexus()
 
     async def die(self):
         await self.events_embed.addField(value="💀 You have been defeated and have taken a minute to respawn")
@@ -71,18 +73,22 @@ class GameEvents():
             name="__Action Taken:__",
             value=f"⚒️ You've started to open the nexus area {self.open_nexus_count}/3 ⚒️"
         )
-        return self.open_nexus_count == 3
+        if self.open_nexus_count == 3:
+            await self.events_embed.change_color(0x2ECC71)
+            return True
 
     def steal_resources(self):
         self.enemy.weapon = WEAPONS["hand"]
         players[self.user.id].has_stolen = True
         
-    def doBasicGear(self):
+    async def do_basic_gear(self):
         players[self.user.id].gear = "basic"
         players[self.user.id].weapon = WEAPONS["stoneSword"]
         players[self.user.id].max_health = 30
+        await self.events_embed.change_color(0x2ECC71)
 
-    def doAdvancedGear(self):
+    async def do_advanced_gear(self):
         players[self.user.id].gear = "advanced"
         players[self.user.id].weapon = WEAPONS["diamondSword"]
         players[self.user.id].max_health = 50
+        await self.events_embed.change_color(0x2ECC71)

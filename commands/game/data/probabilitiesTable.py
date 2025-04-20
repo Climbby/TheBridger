@@ -68,7 +68,7 @@ class Probabilities():
                             • **HP:** ❤️ 30 HP"
                     )
                 players[self.user.id].resources["base"] -= 3
-                self.events.doBasicGear()                
+                await self.events.do_basic_gear()                
             
             case "doAdvancedGear":
                 await self.events_embed.addField(
@@ -79,7 +79,7 @@ class Probabilities():
                             • **HP:** ❤️ 30 HP"
                     )
                 players[self.user.id].resources["mid"] -= 3
-                self.events.doAdvancedGear()                
+                await self.events.do_advanced_gear()                
 
             case "fight":
                 await self.events_embed.addField(name="__Action Taken:__", value=f"⚔️ You have fought the enemy.")

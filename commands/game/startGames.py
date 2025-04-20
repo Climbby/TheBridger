@@ -2,7 +2,7 @@ from commands.game.gameLogic import TheBridgeGame
 import asyncio
 
 active_games = {}
-GAME_TICK_INTERVAL = 2
+GAME_TICK_INTERVAL = 3
 SELF_DESTRUCT_DELAY = 60
 
 class GameStarter:
@@ -19,7 +19,7 @@ class GameStarter:
             await self.run_game_loop()
 
             # After game ends
-            await self.thread.send("⏳ The game has ended and will self-destruct in a minute...")
+            await self.thread.send(f"The channel will be deleted in {SELF_DESTRUCT_DELAY} Seconds")
             await asyncio.sleep(SELF_DESTRUCT_DELAY)
             
         finally:

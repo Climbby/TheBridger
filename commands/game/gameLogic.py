@@ -25,8 +25,8 @@ class TheBridgeGame():
         self.state = GameState()
         self.channel = channel
         self.user = user
-        self.events_embed = GameEmbed()
-        self.options_embed = GameEmbed()
+        self.events_embed = GameEmbed(color=0xDEE0FC)
+        self.options_embed = GameEmbed(color=0x3498DB)
         self.events = GameEvents(self.state, user, self.events_embed)
         self.options = OptionsSelection(self.options_embed, self.events_embed, self.state, self.nextEvent, self.events, user, channel)
         self.probabilities = Probabilities(self.state, self.user, self.events_embed, self.events)
@@ -34,13 +34,10 @@ class TheBridgeGame():
     async def passTime(self):
         """Where each game tick is processed."""
         await self.regenHealth(REGEN_AMOUNT)
-        await self.events_embed.resetEmbed()
-        await self.options_embed.resetEmbed()
+        await self.events_embed.resetEmbed(color=0xDEE0FC)
+        await self.options_embed.resetEmbed(color=0x3498DB)
         self.state.minute += 1
         await self.options.sendOptions()
-
-        if players[self.user.id].is_dead:
-            self.events_embed.color = 0x474747
 
         if self.state.my_nexus_hp <= 0 or self.state.enemy_nexus_hp <= 0:
             await self.events_embed.setDescription(f"**Minute {self.state.minute}** ⏱️")
@@ -49,6 +46,7 @@ class TheBridgeGame():
             return
         
         if players[self.user.id].is_dead:
+            await self.events_embed.change_color(0x474747)
             await self.nextEvent()
             if self.state.minute >= SUDDEN_DEATH_MINUTE:
                 await self.events.sudden_death()
@@ -70,7 +68,6 @@ class TheBridgeGame():
 
         try:
             await self.events_embed.setDescription(f"**Minute {self.state.minute}** ⏱️")
-            self.events_embed.color = 0x474747
             await self.channel.send(embed=self.events_embed.embed)
         except Exception:
             pass
