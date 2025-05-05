@@ -76,7 +76,7 @@ class Probabilities():
                     value=f"• **Type:** ✨ Advanced Gear ✨ \n \
                             • **Cost:** 💰 3 **ADVANCED** resources \n \
                             • **Weapon:** ⚔️ **Diamond Sword** \n \
-                            • **HP:** ❤️ 30 HP"
+                            • **HP:** ❤️ 50 HP"
                     )
                 players[self.user.id].resources["mid"] -= 3
                 await self.events.do_advanced_gear()                
