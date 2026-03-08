@@ -79,7 +79,7 @@ class OptionsSelection():
 
     async def prepare_options_embed(self):
         await self.options_embed.setDescription(
-            description=f"Choose your option, you're in {OPTIONS_DISPLAY_NAME[f"{self.state.area}_place"]}"
+            description=f"Choose your option, you're in {OPTIONS_DISPLAY_NAME[f'{self.state.area}_place']}"
         )
 
         for i in range(len(self.list_of_options)):
