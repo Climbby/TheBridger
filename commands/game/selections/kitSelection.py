@@ -71,7 +71,7 @@ class KitsButton(discord.ui.View):
             if kit["label"] == self.player.kit:
                 kit["handler"](self.player)
                 stats_embed = create_stats_embed(self.player, self.owner.display_name, color=kit["color"])
-                await self.thread.send(content=f"# __{kit["label"]}__ {kit["emoji"]} Activated!", embed=stats_embed)
+                await self.thread.send(content=f"# __{kit['label']}__ {kit['emoji']} Activated!", embed=stats_embed)
                 await asyncio.sleep(1)
                 await self.thread.send("_(you can do /mystats during the game)_")
         
