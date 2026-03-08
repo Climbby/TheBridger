@@ -36,8 +36,8 @@ class Player:
                 return {"🎒 Kit:"       : f"{self.kit} KIT"} 
             
             case "resources":
-                return {"💰 Resources:" : f"{self.resources["base"]} (basic)\n"
-                                          f"{self.resources["mid"]} (advanced)"}
+                return {"💰 Resources:" : f"{self.resources['base']} (basic)\n"
+                                          f"{self.resources['mid']} (advanced)"}
         
     def display_stats(self, embed):
         """Adds all stats to a Discord embed."""
