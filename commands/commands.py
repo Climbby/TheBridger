@@ -41,7 +41,7 @@ def create_stats_embed(player, display_name, color=discord.Colour.blurple()):
 def create_kits(embed):
     for kit in KITS:
         embed.add_field(
-            name=f"{kit["label"]} {kit["emoji"]}", 
+            name=f"{kit['label']} {kit['emoji']}", 
             value=kit["description"], 
             inline=True
         )
